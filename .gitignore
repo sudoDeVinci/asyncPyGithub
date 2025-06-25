@@ -1,3 +1,6 @@
+#cache files
+__github_cache__/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
