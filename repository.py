@@ -1,4 +1,8 @@
-from requests import get
+from requests import (
+     get,
+     post,
+     put
+)
 from time import time
 import asyncio
 from types import CoroutineType
@@ -13,11 +17,67 @@ from base import (
     LOGGER
 )
 from _types import (
-    User,
     Repository,
     RepoSlice,
-    ErrorMessage
+    ErrorMessage,
+    RepositoryType,
+    RepoSortDirection,
+    RepoSortCriterion,
+    RepoVisibility
 )
+
+
+
+async def get_organization_repo(
+    organization: str,
+    type: RepositoryType = 'all',
+    sort: RepoSortCriterion = 'full_name',
+    direction: RepoSortDirection = 'asc',
+    per_page: int = 30,
+    page: int = 1,
+) -> tuple[int, list[Repository]]:
+    """
+    Lists repositories for the specified organization.
+    This endpoint can be used without authentication, or
+    with read access to public repositories.
+    """
+    params = {
+        'type': type,
+        'sort': sort,
+        'direction': direction,
+        'per_page': per_page,
+        'page': page,
+    }
+
+    response = await req(
+        fn=get,
+        url=f'/orgs/{organization}/repos',
+        params=params,
+        headers={
+            'accept': 'application/vnd.github+json'
+        }
+    )
+
+    return (response.status_code, cast(list[Repository], response.json()))
+
+
+
+async def create_organization_repo():
+    """
+    Creates a new repository in the specified organization. The authenticated user must be a member of the organization.
+    OAuth app tokens and personal access tokens (classic) need the public_repo or repo scope to create a public repository,
+    and repo scope to create a private repository.
+    Fine grained personal access tokens need the "Administration" repository permissions (write).
+    """
+    params = {
+         
+    }
+    # TODO: Implement this function
+    response = post(
+         
+    )
+
+
 
 async def get_repo_languages(
     username: str,
@@ -45,12 +105,12 @@ async def get_repo_languages(
 
 
 async def get_repos_authenticated(
-        visibility: Literal['public', 'private', 'all'] = 'all',
+        visibility: RepoVisibility = 'all',
         per_page: int = 30,
         affiliation: Sequence[Literal['owner', 'collaborator', 'organization_member']] = ('owner', 'collaborator', 'organization_member',),
-        type: Literal['all', 'owner', 'public', 'private', 'member'] | None = None,
-        sort: Literal['created', 'updated', 'pushed', 'full_name'] = 'full_name',
-        direction: Literal['asc', 'desc'] = 'asc',
+        type: RepositoryType | None = None,
+        sort: RepoSortCriterion = 'full_name',
+        direction: RepoSortDirection = 'asc',
         page: int = 1,
         since: str = None,
         before: str = None,
@@ -96,11 +156,12 @@ async def get_repos_authenticated(
             url='/user/repos',
             params=params,
         )
-    return (res.status_code, res.json())
+
+    return (res.status_code, cast(list[Repository], res.json()))
 
 
 async def get_repos_authenticated_extended(
-        visibility: Literal['public', 'private', 'all'] = 'all',
+        visibility: RepoVisibility = 'all',
         per_page: int = 30,
         affiliation: Sequence[Literal['owner', 'collaborator', 'organization_member']] = ('owner', 'collaborator', 'organization_member',),
         type: Literal['all', 'owner', 'public', 'private', 'member'] | None = None,

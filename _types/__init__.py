@@ -1,15 +1,26 @@
 from .repos import (
-    User,
+    RepositoryType,
+    RepoSortCriterion,
+    RepoSortDirection,
+    RepoVisibility,
     Repository,
     RepoSlice,
     ContentFile,
-    ErrorMessage
+    ErrorMessage,
+)
+
+from .users import (
+    User
 )
 
 __all__ = (
-    "User",
-    "Repository",
-    "RepoSlice",
-    "ContentFile",
-    "ErrorMessage"
+    'RepositoryType',
+    'RepoSortCriterion',
+    'RepoSortDirection',
+    'RepoVisibility',
+    'Repository',
+    'RepoSlice',
+    'ContentFile',
+    'ErrorMessage',
+    'User',
 )

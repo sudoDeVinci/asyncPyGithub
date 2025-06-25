@@ -70,4 +70,5 @@ async def async_gathered_example() -> None:
     results = await asyncio.gather(*funcs)
 ```
 
-This example on average will grant us a 2x speedup, not allowing the waiting time of each API call to block the others on which it does not rely.
+This example on average will grant us at least a 3x speedup, not allowing the waiting time of each API call to block the others on which it does not rely.
+The gap between the synchronous and async time taken for independent function calls grows basocally exponentially (assumind the same time for pos/pre-processing of your data).
