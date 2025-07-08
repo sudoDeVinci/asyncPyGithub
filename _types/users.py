@@ -1,87 +1,943 @@
-from typing import TypedDict
+from typing_extensions import (
+    TypedDict,
+    NotRequired,
+    Optional,
+)
 
-class User(TypedDict, total=False):
-    """
-    A GitHub authenticated User.
+from pydantic import (
+    BaseModel,
+    Field,
+    EmailStr,
+    HttpUrl,
+    PastDatetime
+)
 
-    Attributes:
-        login (str): The username of the user.
-        id (int): The unique identifier for the user.
-        node_id (str): The node ID of the user.
-        avatar_url (str): The URL to the user's avatar image.
-        gravatar_id (str): The Gravatar ID of the user.
-        url (str): The API URL for the user.
-        html_url (str): The HTML URL for the user's profile.
-        followers_url (str): The URL to fetch followers of the user.
-        following_url (str): The URL to fetch users followed by this user.
-        gists_url (str): The URL to fetch gists created by this user.
-        starred_url (str): The URL to fetch starred repositories by this user.
-        subscriptions_url (str): The URL to fetch subscriptions of this user.
-        organizations_url (str): The URL to fetch organizations this user belongs to.
-        repos_url (str): The URL to fetch repositories owned by this user.
-        events_url (str): The URL to fetch public events for this user.
-        received_events_url (str): The URL to fetch received events for this user.
-        type (str): The type of the user, e.g., "User" or "Bot".
-        site_admin (bool): Whether the user is a site administrator.
-        name (str | None): The full name of the user, if available.
-        company (str | None): The company associated with the user, if available.
-        blog (str | None): The blog URL of the user, if available.
-        location (str | None): The location of the user, if available.
-        email (str | None): The email address of the user, if available.
-        hireable (bool | None): Whether the user is hireable, if specified.
-        bio (str | None): A short biography of the user, if available.
-        twitter_username (str | None): The Twitter username of the user, if available.
-        public_repos (int): Number of public repositories owned by the user.
-        public_gists (int): Number of public gists created by the user.
-        followers (int): Number of followers this user has.
-        following (int): Number of users this user is following.
-        created_at (str): Timestamp when the user's account was created.
-        updated_at (str): Timestamp when the user's account was last updated.
-        private_gists (int | None): Number of private gists created by the user, if available.
-        total_private_repos (int | None): Total number of private repositories owned by the user, if available.
-        owned_private_repos (int | None): Number of private repositories owned by the user, if available.
-        disk_usage (int | None): Disk usage of the user's repositories, if available.
-        collaborators (int | None): Number of collaborators in the user's private repositories, if available.
-        two_factor_authentication (bool): Whether the user has two-factor authentication enabled.
-        plan (dict[str, str | int | bool] | None): Information about the user's plan, if available.
+UserJSONSchema = {
+  "oneOf": [
+    {
+      "title": "Private User",
+      "description": "Private User",
+      "type": "object",
+      "properties": {
+        "login": {
+          "type": "string",
+          "examples": [
+            "octocat"
+          ]
+        },
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "examples": [
+            1
+          ]
+        },
+        "user_view_type": {
+          "type": "string"
+        },
+        "node_id": {
+          "type": "string",
+          "examples": [
+            "MDQ6VXNlcjE="
+          ]
+        },
+        "avatar_url": {
+          "type": "string",
+          "format": "uri",
+          "examples": [
+            "https://github.com/images/error/octocat_happy.gif"
+          ]
+        },
+        "gravatar_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "examples": [
+            "41d064eb2195891e12d0413f63227ea7"
+          ]
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "examples": [
+            "https://api.github.com/users/octocat"
+          ]
+        },
+        "html_url": {
+          "type": "string",
+          "format": "uri",
+          "examples": [
+            "https://github.com/octocat"
+          ]
+        },
+        "followers_url": {
+          "type": "string",
+          "format": "uri",
+          "examples": [
+            "https://api.github.com/users/octocat/followers"
+          ]
+        },
+        "following_url": {
+          "type": "string",
+          "examples": [
+            "https://api.github.com/users/octocat/following{/other_user}"
+          ]
+        },
+        "gists_url": {
+          "type": "string",
+          "examples": [
+            "https://api.github.com/users/octocat/gists{/gist_id}"
+          ]
+        },
+        "starred_url": {
+          "type": "string",
+          "examples": [
+            "https://api.github.com/users/octocat/starred{/owner}{/repo}"
+          ]
+        },
+        "subscriptions_url": {
+          "type": "string",
+          "format": "uri",
+          "examples": [
+            "https://api.github.com/users/octocat/subscriptions"
+          ]
+        },
+        "organizations_url": {
+          "type": "string",
+          "format": "uri",
+          "examples": [
+            "https://api.github.com/users/octocat/orgs"
+          ]
+        },
+        "repos_url": {
+          "type": "string",
+          "format": "uri",
+          "examples": [
+            "https://api.github.com/users/octocat/repos"
+          ]
+        },
+        "events_url": {
+          "type": "string",
+          "examples": [
+            "https://api.github.com/users/octocat/events{/privacy}"
+          ]
+        },
+        "received_events_url": {
+          "type": "string",
+          "format": "uri",
+          "examples": [
+            "https://api.github.com/users/octocat/received_events"
+          ]
+        },
+        "type": {
+          "type": "string",
+          "examples": [
+            "User"
+          ]
+        },
+        "site_admin": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "examples": [
+            "monalisa octocat"
+          ]
+        },
+        "company": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "examples": [
+            "GitHub"
+          ]
+        },
+        "blog": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "examples": [
+            "https://github.com/blog"
+          ]
+        },
+        "location": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "examples": [
+            "San Francisco"
+          ]
+        },
+        "email": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "email",
+          "examples": [
+            "octocat@github.com"
+          ]
+        },
+        "notification_email": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "email",
+          "examples": [
+            "octocat@github.com"
+          ]
+        },
+        "hireable": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "bio": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "examples": [
+            "There once was..."
+          ]
+        },
+        "twitter_username": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "examples": [
+            "monalisa"
+          ]
+        },
+        "public_repos": {
+          "type": "integer",
+          "examples": [
+            2
+          ]
+        },
+        "public_gists": {
+          "type": "integer",
+          "examples": [
+            1
+          ]
+        },
+        "followers": {
+          "type": "integer",
+          "examples": [
+            20
+          ]
+        },
+        "following": {
+          "type": "integer",
+          "examples": [
+            0
+          ]
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "examples": [
+            "2008-01-14T04:33:35Z"
+          ]
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "examples": [
+            "2008-01-14T04:33:35Z"
+          ]
+        },
+        "private_gists": {
+          "type": "integer",
+          "examples": [
+            81
+          ]
+        },
+        "total_private_repos": {
+          "type": "integer",
+          "examples": [
+            100
+          ]
+        },
+        "owned_private_repos": {
+          "type": "integer",
+          "examples": [
+            100
+          ]
+        },
+        "disk_usage": {
+          "type": "integer",
+          "examples": [
+            10000
+          ]
+        },
+        "collaborators": {
+          "type": "integer",
+          "examples": [
+            8
+          ]
+        },
+        "two_factor_authentication": {
+          "type": "boolean",
+          "examples": [
+            True
+          ]
+        },
+        "plan": {
+          "type": "object",
+          "properties": {
+            "collaborators": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "space": {
+              "type": "integer"
+            },
+            "private_repos": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "collaborators",
+            "name",
+            "space",
+            "private_repos"
+          ]
+        },
+        "business_plus": {
+          "type": "boolean"
+        },
+        "ldap_dn": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "avatar_url",
+        "events_url",
+        "followers_url",
+        "following_url",
+        "gists_url",
+        "gravatar_id",
+        "html_url",
+        "id",
+        "node_id",
+        "login",
+        "organizations_url",
+        "received_events_url",
+        "repos_url",
+        "site_admin",
+        "starred_url",
+        "subscriptions_url",
+        "type",
+        "url",
+        "bio",
+        "blog",
+        "company",
+        "email",
+        "followers",
+        "following",
+        "hireable",
+        "location",
+        "name",
+        "public_gists",
+        "public_repos",
+        "created_at",
+        "updated_at",
+        "collaborators",
+        "disk_usage",
+        "owned_private_repos",
+        "private_gists",
+        "total_private_repos",
+        "two_factor_authentication"
+      ]
+    },
+    {
+      "title": "Public User",
+      "description": "Public User",
+      "type": "object",
+      "properties": {
+        "login": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "user_view_type": {
+          "type": "string"
+        },
+        "node_id": {
+          "type": "string"
+        },
+        "avatar_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "gravatar_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "html_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "followers_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "following_url": {
+          "type": "string"
+        },
+        "gists_url": {
+          "type": "string"
+        },
+        "starred_url": {
+          "type": "string"
+        },
+        "subscriptions_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "organizations_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "repos_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "events_url": {
+          "type": "string"
+        },
+        "received_events_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "type": {
+          "type": "string"
+        },
+        "site_admin": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "company": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "blog": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "location": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "email": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "email"
+        },
+        "notification_email": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "email"
+        },
+        "hireable": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "bio": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "twitter_username": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "public_repos": {
+          "type": "integer"
+        },
+        "public_gists": {
+          "type": "integer"
+        },
+        "followers": {
+          "type": "integer"
+        },
+        "following": {
+          "type": "integer"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "plan": {
+          "type": "object",
+          "properties": {
+            "collaborators": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "space": {
+              "type": "integer"
+            },
+            "private_repos": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "collaborators",
+            "name",
+            "space",
+            "private_repos"
+          ]
+        },
+        "private_gists": {
+          "type": "integer",
+          "examples": [
+            1
+          ]
+        },
+        "total_private_repos": {
+          "type": "integer",
+          "examples": [
+            2
+          ]
+        },
+        "owned_private_repos": {
+          "type": "integer",
+          "examples": [
+            2
+          ]
+        },
+        "disk_usage": {
+          "type": "integer",
+          "examples": [
+            1
+          ]
+        },
+        "collaborators": {
+          "type": "integer",
+          "examples": [
+            3
+          ]
+        }
+      },
+      "required": [
+        "avatar_url",
+        "events_url",
+        "followers_url",
+        "following_url",
+        "gists_url",
+        "gravatar_id",
+        "html_url",
+        "id",
+        "node_id",
+        "login",
+        "organizations_url",
+        "received_events_url",
+        "repos_url",
+        "site_admin",
+        "starred_url",
+        "subscriptions_url",
+        "type",
+        "url",
+        "bio",
+        "blog",
+        "company",
+        "email",
+        "followers",
+        "following",
+        "hireable",
+        "location",
+        "name",
+        "public_gists",
+        "public_repos",
+        "created_at",
+        "updated_at"
+      ],
+      "additionalProperties": False
+    }
+  ]
+}
+
+class UserPlanJSON(TypedDict):
     """
+    A GitHub authenticated User's plan.
+    """
+    collaborators: int
+    name: str
+    space: int
+    private_repos: int
+
+class UserJSON(TypedDict, total=False):
+    """
+    A GitHub User.
+    """
+    # Required fields according to the Public User schema
     login: str
     id: int
     node_id: str
-    avatar_url: str
-    gravatar_id: str
-    url: str
-    html_url: str
-    followers_url: str
-    following_url: str
-    gists_url: str
-    starred_url: str
-    subscriptions_url: str
-    organizations_url: str
-    repos_url: str
-    events_url: str
-    received_events_url: str
+    avatar_url: HttpUrl  # has "format": "uri"
+    gravatar_id: Optional[str]  # can be null but required
+    url: HttpUrl  # has "format": "uri"
+    html_url: HttpUrl  # has "format": "uri"
+    followers_url: HttpUrl  # has "format": "uri"
+    following_url: str  # no format specified (template URL)
+    gists_url: str  # no format specified (template URL)
+    starred_url: str  # no format specified (template URL)
+    subscriptions_url: HttpUrl  # has "format": "uri"
+    organizations_url: HttpUrl  # has "format": "uri"
+    repos_url: HttpUrl  # has "format": "uri"
+    events_url: str  # no format specified (template URL)
+    received_events_url: HttpUrl  # has "format": "uri"
     type: str
     site_admin: bool
-    name: str | None
-    company: str | None
-    blog: str | None
-    location: str | None
-    email: str | None
-    hireable: bool | None
-    bio: str | None
-    twitter_username: str | None
+    name: Optional[str]  # can be null but required
+    company: Optional[str]  # can be null but required
+    blog: Optional[str]  # can be null but required
+    location: Optional[str]  # can be null but required
+    email: Optional[EmailStr]  # can be null but required
+    hireable: Optional[bool]  # can be null but required
+    bio: Optional[str]  # can be null but required
     public_repos: int
     public_gists: int
     followers: int
     following: int
-    created_at: str
-    updated_at: str
-    private_gists: int | None
-    total_private_repos: int | None
-    owned_private_repos: int | None
-    disk_usage: int | None
-    collaborators: int | None
-    two_factor_authentication: bool
-    plan: dict[str, str | int | bool] | None
+    created_at: PastDatetime
+    updated_at: PastDatetime
+    
+    # Optional fields (not in required array)
+    user_view_type: Optional[str] = None
+    notification_email: Optional[EmailStr] = None
+    twitter_username: Optional[str] = None
+    plan: Optional[UserPlanJSON] = None
+    private_gists: Optional[int] = None
+    total_private_repos: Optional[int] = None
+    owned_private_repos: Optional[int] = None
+    disk_usage: Optional[int] = None
+    collaborators: Optional[int] = None
+    two_factor_authentication: Optional[bool] = True
+    business_plus: Optional[bool] = False
+    ldap_dn: Optional[str] = None
 
+class User(BaseModel):
+    """
+    A GitHub User.
+    """
+    # Required fields according to the Public User schema
+    login: str
+    id: int
+    node_id: str
+    avatar_url: HttpUrl  # has "format": "uri"
+    gravatar_id: Optional[str]  # can be null but required
+    url: HttpUrl  # has "format": "uri"
+    html_url: HttpUrl  # has "format": "uri"
+    followers_url: HttpUrl  # has "format": "uri"
+    following_url: str  # no format specified (template URL)
+    gists_url: str  # no format specified (template URL)
+    starred_url: str  # no format specified (template URL)
+    subscriptions_url: HttpUrl  # has "format": "uri"
+    organizations_url: HttpUrl  # has "format": "uri"
+    repos_url: HttpUrl  # has "format": "uri"
+    events_url: str  # no format specified (template URL)
+    received_events_url: HttpUrl  # has "format": "uri"
+    type: str
+    site_admin: bool
+    name: Optional[str]  # can be null but required
+    company: Optional[str]  # can be null but required
+    blog: Optional[str]  # can be null but required
+    location: Optional[str]  # can be null but required
+    email: Optional[EmailStr]  # can be null but required
+    hireable: Optional[bool]  # can be null but required
+    bio: Optional[str]  # can be null but required
+    public_repos: int
+    public_gists: int
+    followers: int
+    following: int
+    created_at: PastDatetime
+    updated_at: PastDatetime
+    
+    # Optional fields (not in required array)
+    user_view_type: Optional[str] = None
+    notification_email: Optional[EmailStr] = None
+    twitter_username: Optional[str] = None
+    plan: Optional[UserPlanJSON] = None
+    private_gists: Optional[int] = None
+    total_private_repos: Optional[int] = None
+    owned_private_repos: Optional[int] = None
+    disk_usage: Optional[int] = None
+    collaborators: Optional[int] = None
+    two_factor_authentication: Optional[bool] = True
+    business_plus: Optional[bool] = False
+    ldap_dn: Optional[str] = None
+
+SimpleUserJSONSchema = {
+  "type": "array",
+  "items": {
+    "title": "Simple User",
+    "description": "A GitHub user.",
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "email": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "login": {
+        "type": "string",
+        "examples": [
+          "octocat"
+        ]
+      },
+      "id": {
+        "type": "integer",
+        "format": "int64",
+        "examples": [
+          1
+        ]
+      },
+      "node_id": {
+        "type": "string",
+        "examples": [
+          "MDQ6VXNlcjE="
+        ]
+      },
+      "avatar_url": {
+        "type": "string",
+        "format": "uri",
+        "examples": [
+          "https://github.com/images/error/octocat_happy.gif"
+        ]
+      },
+      "gravatar_id": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "examples": [
+          "41d064eb2195891e12d0413f63227ea7"
+        ]
+      },
+      "url": {
+        "type": "string",
+        "format": "uri",
+        "examples": [
+          "https://api.github.com/users/octocat"
+        ]
+      },
+      "html_url": {
+        "type": "string",
+        "format": "uri",
+        "examples": [
+          "https://github.com/octocat"
+        ]
+      },
+      "followers_url": {
+        "type": "string",
+        "format": "uri",
+        "examples": [
+          "https://api.github.com/users/octocat/followers"
+        ]
+      },
+      "following_url": {
+        "type": "string",
+        "examples": [
+          "https://api.github.com/users/octocat/following{/other_user}"
+        ]
+      },
+      "gists_url": {
+        "type": "string",
+        "examples": [
+          "https://api.github.com/users/octocat/gists{/gist_id}"
+        ]
+      },
+      "starred_url": {
+        "type": "string",
+        "examples": [
+          "https://api.github.com/users/octocat/starred{/owner}{/repo}"
+        ]
+      },
+      "subscriptions_url": {
+        "type": "string",
+        "format": "uri",
+        "examples": [
+          "https://api.github.com/users/octocat/subscriptions"
+        ]
+      },
+      "organizations_url": {
+        "type": "string",
+        "format": "uri",
+        "examples": [
+          "https://api.github.com/users/octocat/orgs"
+        ]
+      },
+      "repos_url": {
+        "type": "string",
+        "format": "uri",
+        "examples": [
+          "https://api.github.com/users/octocat/repos"
+        ]
+      },
+      "events_url": {
+        "type": "string",
+        "examples": [
+          "https://api.github.com/users/octocat/events{/privacy}"
+        ]
+      },
+      "received_events_url": {
+        "type": "string",
+        "format": "uri",
+        "examples": [
+          "https://api.github.com/users/octocat/received_events"
+        ]
+      },
+      "type": {
+        "type": "string",
+        "examples": [
+          "User"
+        ]
+      },
+      "site_admin": {
+        "type": "boolean"
+      },
+      "starred_at": {
+        "type": "string",
+        "examples": [
+          "\"2020-07-09T00:17:55Z\""
+        ]
+      },
+      "user_view_type": {
+        "type": "string",
+        "examples": [
+          "public"
+        ]
+      }
+    },
+    "required": [
+      "avatar_url",
+      "events_url",
+      "followers_url",
+      "following_url",
+      "gists_url",
+      "gravatar_id",
+      "html_url",
+      "id",
+      "node_id",
+      "login",
+      "organizations_url",
+      "received_events_url",
+      "repos_url",
+      "site_admin",
+      "starred_url",
+      "subscriptions_url",
+      "type",
+      "url"
+    ]
+  }
+}
+
+class SimpleUserJSON(TypedDict):
+  """
+  A simple GitHub user.
+  """
+  name: Optional[str] = None
+  email: Optional[str] = None
+  login: str
+  id: int
+  node_id: str
+  avatar_url: HttpUrl  # has "format": "uri"
+  gravatar_id: Optional[str]  # can be null but required
+  url: HttpUrl  # has "format": "uri"
+  html_url: HttpUrl  # has "format": "uri"
+  followers_url: HttpUrl  # has "format": "uri"
+  following_url: str  # no format specified (template URL)
+  gists_url: str  # no format specified (template URL)
+  starred_url: str  # no format specified (template URL)
+  subscriptions_url: HttpUrl  # has "format": "uri"
+  organizations_url: HttpUrl  # has "format": "uri"
+  repos_url: HttpUrl  # has "format": "uri"
+  events_url: str  # no format specified (template URL)
+  received_events_url: HttpUrl  # has "format": "uri"
+  type: str
+  site_admin: bool
+  starred_at: Optional[str] = None
+  user_view_type: Optional[str] = None
+
+class SimpleUser(BaseModel):
+  """
+  A simple GitHub user.
+  """
+  name: Optional[str] = None
+  email: Optional[str] = None
+  login: str
+  id: int
+  node_id: str
+  avatar_url: HttpUrl  # has "format": "uri"
+  gravatar_id: Optional[str]  # can be null but required
+  url: HttpUrl  # has "format": "uri"
+  html_url: HttpUrl  # has "format": "uri"
+  followers_url: HttpUrl  # has "format": "uri"
+  following_url: str  # no format specified (template URL)
+  gists_url: str  # no format specified (template URL)
+  starred_url: str  # no format specified (template URL)
+  subscriptions_url: HttpUrl  # has "format": "uri"
+  organizations_url: HttpUrl  # has "format": "uri"
+  repos_url: HttpUrl  # has "format": "uri"
+  events_url: str  # no format specified (template URL)
+  received_events_url: HttpUrl  # has "format": "uri"
+  type: str
+  site_admin: bool
+  starred_at: Optional[str] = None
+  user_view_type: Optional[str] = None

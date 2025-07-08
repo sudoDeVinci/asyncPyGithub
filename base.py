@@ -10,10 +10,11 @@ from requests import Response, get
 from pathlib import Path
 import asyncio
 from threading import Lock
-from json import dump, JSONDecodeError, load
+from json import dump, dumps, JSONDecodeError, load
 
 from _types import (
     User,
+    UserJSON,
     RepoSlice
 )
 
@@ -62,7 +63,7 @@ def write_json(fp: Path, data: dict[str, Any] | None) -> bool:
         return False
     
     try:
-        with open(fp, 'w', encoding='utf-8') as f:
+        with open(fp, 'w') as f:
             dump(data, f, indent=4, ensure_ascii=False)
             LOGGER.info(f"write_json:::{fp} written to successfully")
             return True
@@ -116,20 +117,6 @@ async def req(fn: Callable, url: str, **kwargs) -> Response:
     r = await asyncio.to_thread(fn, f'{API_ENDPOINT}{url}', **kwargs)
     await asyncio.sleep(0.10)
     return r
-
-
-
-async def get_authenticated_user() -> tuple[int, User]:
-    """
-    Asynchronously retrieves the authenticated user's information from the GitHub API.
-    Returns:
-        tuple[int, User]: A tuple containing the HTTP status code and the user's information as a dictionary.
-    """
-    res = await req(fn = get,
-              url='/user',)
-    return (res.status_code, res.json())
-
-
 
 async def get_file_details(
         username: str,

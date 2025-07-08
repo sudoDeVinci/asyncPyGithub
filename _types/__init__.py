@@ -1,3 +1,8 @@
+from .base import (
+    ErrorMessage,
+    JSONDict,
+)
+
 from .repos import (
     RepositoryType,
     RepoSortCriterion,
@@ -6,21 +11,33 @@ from .repos import (
     Repository,
     RepoSlice,
     ContentFile,
-    ErrorMessage,
 )
 
 from .users import (
-    User
+    UserPlanJSON,
+    UserJSONSchema,
+    UserJSON,
+    User,
+    SimpleUserJSONSchema,
+    SimpleUserJSON,
+    SimpleUser,
 )
 
 __all__ = (
-    'RepositoryType',
-    'RepoSortCriterion',
-    'RepoSortDirection',
-    'RepoVisibility',
-    'Repository',
-    'RepoSlice',
-    'ContentFile',
-    'ErrorMessage',
-    'User',
+    "ErrorMessage",
+    "JSONDict",
+    "RepositoryType",
+    "RepoSortCriterion",
+    "RepoSortDirection",
+    "RepoVisibility",
+    "Repository",
+    "RepoSlice",
+    "ContentFile",
+    "UserPlanJSON",
+    "UserJSON",
+    "User",
+    "UserJSONSchema",
+    "SimpleUserJSONSchema",
+    "SimpleUserJSON",
+    "SimpleUser",
 )

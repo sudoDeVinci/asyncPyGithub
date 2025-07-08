@@ -1,7 +1,7 @@
 from requests import (
-     get,
-     post,
-     put
+    get,
+    post,
+    put
 )
 from time import time
 import asyncio

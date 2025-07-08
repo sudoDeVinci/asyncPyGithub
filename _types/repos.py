@@ -1,10 +1,18 @@
+from pydantic import (
+    BaseModel,
+    Field,
+    HttpUrl,
+    EmailStr
+)
+
 from typing import (
     TypedDict,
     NotRequired,
     Literal,
 )
 
-from .users import User
+from .users import UserJSON
+from .base import ErrorMessage
 
 
 RepositoryType = Literal[
@@ -149,7 +157,7 @@ class Repository(TypedDict, total=False):
     name: str
     full_name: str
     private: bool
-    owner: User
+    owner: UserJSON
     html_url: str
     description: str | None
     fork: bool
@@ -256,18 +264,6 @@ class ContentFile(TypedDict, total=False):
     download_url: str | None
     _links: dict[str, str]
 
-
-class ErrorMessage(TypedDict, total=False):
-    """
-    Represents an error message with a code and description.
-    
-    Attributes:
-        code (int): The error code.
-        message (str): A description of the error.
-    """
-    code: int
-    message: str
-    endpoint: str | None
 
 class RepoSlice(TypedDict, total=False):
     """
