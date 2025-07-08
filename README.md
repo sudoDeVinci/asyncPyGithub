@@ -65,7 +65,7 @@ To get the full benefits, we can use `asyncio.gather` like so:
 
 ```py
 async def async_gathered_example() -> None:
-    awaitables:list[CoroutineType[UserQueryReturnable, Any, Any]] = (
+    awaitables:list[CoroutineType[Any, Any, UserQueryReturnable]] = (
         User.get_by_id( ... )
         User.get_by_username( ... )
         User.all( ... )
