@@ -12,7 +12,7 @@ An asynchronous Python library for interacting with the GitHub API, built with m
 
 ## Installation
 
-Relies on `requests`, `python-dotenv` and `Pydanticv2`
+Relies on `requests`, `python-dotenv` and `Pydanticv2`.
 
 ```bash
 pip install -r reqs.txt
@@ -35,7 +35,7 @@ from asyncpygithub import User
 async def main():
     status, user = await User.authenticate()
     if status == 200:
-        print(f"Hello, {user['login']}!")
+        print(f"Hello, {user.login}!")
     else:
         ...
 
