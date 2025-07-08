@@ -6,16 +6,14 @@ from _types import (
     SimpleUserJSON,
     SimpleUser,
 )
-from User import (
-    User
-)
+from User import User
 
 __all__ = (
-    'UserPlanJSON',
-    'ErrorMessage',
-    'JSONDict',
-    'UserJSON',
-    'SimpleUserJSON',
-    'SimpleUser',
-    'User',
+    "UserPlanJSON",
+    "ErrorMessage",
+    "JSONDict",
+    "UserJSON",
+    "SimpleUserJSON",
+    "SimpleUser",
+    "User",
 )

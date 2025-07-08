@@ -1,3 +1,5 @@
+![Linting](https://github.com/sudoDeVinci/asyncPyGithub/actions/workflows/linting.yml)
+
 # asyncPyGithub
 
 An asynchronous Python library for interacting with the GitHub API, built with modern Python features and type safety.

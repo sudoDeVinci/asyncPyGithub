@@ -1,25 +1,17 @@
-from typing import (
-    Final,
-    Callable,
-    Any
-)
+from typing import Final, Callable, Any
 from os import environ, makedirs
-from dotenv import load_dotenv # type: ignore
+from dotenv import load_dotenv  # type: ignore
 from logging import getLogger, Logger
 from requests import Response, get
 from pathlib import Path
 import asyncio
 from threading import Lock
-from json import dump, dumps, JSONDecodeError, load
+from json import dump, JSONDecodeError, load
 
-from _types import (
-    User,
-    UserJSON,
-    RepoSlice
-)
+from _types import User, RepoSlice
 
 LOGGER: Logger = getLogger(__name__)
-LOGGER.setLevel('INFO')
+LOGGER.setLevel("INFO")
 
 load_dotenv()
 CWD: Final[Path] = Path(__file__).parent.resolve()
@@ -37,16 +29,17 @@ USER_CACHE_LOCK: Lock = Lock()
 
 
 try:
-    assert load_dotenv(verbose=True), "Failed to load environment variables from .env file."
+    assert load_dotenv(
+        verbose=True
+    ), "Failed to load environment variables from .env file."
     TOKEN: Final[str | None] = environ.get("GITHUB_TOKEN", None)
-    API_VERSION: Final[str] = '2022-11-28'
-    API_ENDPOINT: Final[str] = 'https://api.github.com'
+    API_VERSION: Final[str] = "2022-11-28"
+    API_ENDPOINT: Final[str] = "https://api.github.com"
 
     assert TOKEN is not None, "GITHUB_TOKEN must be set in environment variables."
 except (AssertionError, AttributeError, OSError) as err:
     LOGGER.error(f"Error during global configuration:::{err}")
     raise ValueError(err) from err
-
 
 
 def write_json(fp: Path, data: dict[str, Any] | None) -> bool:
@@ -61,16 +54,15 @@ def write_json(fp: Path, data: dict[str, Any] | None) -> bool:
     if not data:
         LOGGER.warning(f"write_json:::No data to write to {fp}")
         return False
-    
+
     try:
-        with open(fp, 'w') as f:
+        with open(fp, "w") as f:
             dump(data, f, indent=4, ensure_ascii=False)
             LOGGER.info(f"write_json:::{fp} written to successfully")
             return True
     except (IOError, OSError) as err:
         LOGGER.error(f"write_json:::Failed to write data {err} to file {fp}")
         return False
-    
 
 
 def read_json(fp: Path) -> dict[str, Any] | None:
@@ -84,16 +76,15 @@ def read_json(fp: Path) -> dict[str, Any] | None:
     if not fp.exists():
         LOGGER.warning(f"read_json:::File {fp} does not exist.")
         return None
-    
+
     try:
-        with open(fp, 'r', encoding='utf-8') as f:
+        with open(fp, "r", encoding="utf-8") as f:
             data = load(f)
             LOGGER.info(f"read_json:::{fp} read successfully")
             return data
     except (IOError, OSError, JSONDecodeError) as err:
         LOGGER.error(f"read_json:::Failed to read data from {fp} with error: {err}")
         return None
-
 
 
 async def req(fn: Callable, url: str, **kwargs) -> Response:
@@ -106,22 +97,24 @@ async def req(fn: Callable, url: str, **kwargs) -> Response:
     Returns:
         Response: The response object returned by the request function.
     """
-    kwargs['timeout'] = 30
-    kwargs.setdefault('headers', {}).update(
+    kwargs["timeout"] = 30
+    kwargs.setdefault("headers", {}).update(
         {
-            'Authorization': f'Bearer {TOKEN}',
-            'X-GitHub-Api-Version': API_VERSION,
-            'User-Agent': 'asyncPyGithub/1.0.0',
-            'Accept': 'application/vnd.github.v3+json',
-        })
-    r = await asyncio.to_thread(fn, f'{API_ENDPOINT}{url}', **kwargs)
+            "Authorization": f"Bearer {TOKEN}",
+            "X-GitHub-Api-Version": API_VERSION,
+            "User-Agent": "asyncPyGithub/1.0.0",
+            "Accept": "application/vnd.github.v3+json",
+        }
+    )
+    r = await asyncio.to_thread(fn, f"{API_ENDPOINT}{url}", **kwargs)
     await asyncio.sleep(0.10)
     return r
 
+
 async def get_file_details(
-        username: str,
-        repository: str,
-        path: str,
+    username: str,
+    repository: str,
+    path: str,
 ) -> tuple[int, dict[str, Any] | None]:
     """
     Asynchronously retrieves the content of a file in a specific repository.
@@ -135,11 +128,7 @@ async def get_file_details(
     """
     response = await req(
         fn=get,
-        url=f'/repos/{username}/{repository}/contents/{path}',
+        url=f"/repos/{username}/{repository}/contents/{path}",
     )
 
-    return (
-        response.status_code,
-        response.json()
-    )
-
+    return (response.status_code, response.json())

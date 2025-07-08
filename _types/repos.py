@@ -1,10 +1,3 @@
-from pydantic import (
-    BaseModel,
-    Field,
-    HttpUrl,
-    EmailStr
-)
-
 from typing import (
     TypedDict,
     NotRequired,
@@ -16,13 +9,7 @@ from .base import ErrorMessage
 
 
 RepositoryType = Literal[
-    'all',
-    'public',
-    'private',
-    'forks',
-    'sources',
-    'member',
-    'owner'
+    "all", "public", "private", "forks", "sources", "member", "owner"
 ]
 """
 The different types of repositories that can be queried from GitHub.
@@ -33,33 +20,21 @@ Refer to the [`documentation`](https://docs.github.com/en/rest/repos/repos?apiVe
 """
 
 
-RepoSortCriterion = Literal[
-    'created',
-    'updated',
-    'pushed',
-    'full_name'
-]
+RepoSortCriterion = Literal["created", "updated", "pushed", "full_name"]
 """
 The criteria by which repositories can be sorted when querying GitHub.
 Usually defaults to 'full_name'.
 """
 
 
-RepoSortDirection = Literal[
-    'asc',
-    'desc'
-]
+RepoSortDirection = Literal["asc", "desc"]
 """
 The direction in which repositories can be sorted when querying GitHub.
 Usually defaults to 'asc'.
 """
 
 
-RepoVisibility = Literal[
-    'public',
-    'private',
-    'all'
-]
+RepoVisibility = Literal["public", "private", "all"]
 """
 The visibility of repositories when querying GitHub.
 Usually defaults to 'all'.
@@ -152,6 +127,7 @@ class Repository(TypedDict, total=False):
         default_branch (str): The default branch of the repository.
         permissions (dict[str, bool] | None): Permissions for the authenticated user on this repository.
     """
+
     id: int
     node_id: str
     name: str
@@ -233,7 +209,7 @@ class Repository(TypedDict, total=False):
     watchers: int
     default_branch: str
     permissions: dict[str, bool] | None
-    
+
 
 class ContentFile(TypedDict, total=False):
     """
@@ -252,6 +228,7 @@ class ContentFile(TypedDict, total=False):
         download_url (str | None): The URL to download the file, if available.
         _links (dict[str, str]): Links related to the file, such as self, git, and html URLs.
     """
+
     name: str
     type: str
     size: int
@@ -268,13 +245,14 @@ class ContentFile(TypedDict, total=False):
 class RepoSlice(TypedDict, total=False):
     """
     Represents a slice of GitHub repositories with metadata.
-    
+
     Attributes:
         count (int): The total number of repositories in this slice.
         updated (int): The timestamp when this slice was last updated.
         repos (list[RepoGist | Repository]): A list of repositories.
         errors (list[ErrorMessage] | None): A list of error messages, if any.
     """
+
     count: int
     updated: int
     repos: list[Repository]
