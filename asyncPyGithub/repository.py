@@ -3,8 +3,8 @@ from time import time
 import asyncio
 from types import CoroutineType
 from typing import cast, Any, Literal, Sequence
-from base import req, LOGGER
-from _types import (
+from asyncPyGithub.base import req, LOGGER
+from ._types import (
     Repository,
     RepoSlice,
     ErrorMessage,
@@ -78,8 +78,8 @@ async def get_repos_authenticated(
     sort: RepoSortCriterion = "full_name",
     direction: RepoSortDirection = "asc",
     page: int = 1,
-    since: str = None,
-    before: str = None,
+    since: str | None = None,
+    before: str | None = None,
 ) -> tuple[int, list[Repository]]:
     """
     Asynchronously retrieves repositories for the authenticated user from the GitHub API.
@@ -146,8 +146,8 @@ async def get_repos_authenticated_extended(
     sort: Literal["created", "updated", "pushed", "full_name"] = "full_name",
     direction: Literal["asc", "desc"] = "asc",
     page: int = 1,
-    since: str = None,
-    before: str = None,
+    since: str | None = None,
+    before: str | None = None,
 ) -> RepoSlice:
     """
     Asynchronously retrieves repositories for the authenticated user from the GitHub API.
@@ -192,7 +192,9 @@ async def get_repos_authenticated_extended(
         LOGGER.error(
             f"Failed to retrieve repositories with::{reporesponse[0]}::{reporesponse[1]}"
         )
-        outputSlice["errors"].append(
+        if outputSlice["errors"] is None:
+            outputSlice["errors"] = []
+        outputSlice["errors"].append(  # type: ignore[union-attr]
             ErrorMessage(
                 message=f"Failed to retrieve repositories with::{reporesponse[0]}::{reporesponse[1]}",
                 code=reporesponse[0],
@@ -207,14 +209,14 @@ async def get_repos_authenticated_extended(
         return outputSlice
 
     languagecoroutines: list[CoroutineType[Any, Any, tuple[int, dict[str, int]]]] = [
-        get_repo_languages(username=repo["owner"]["login"], repository=repo["name"])
+        get_repo_languages(username=repo["owner"]["login"], repository=repo["name"])  # type: ignore
         for repo in reporesponse[1]
     ]
 
     language_results = await asyncio.gather(*languagecoroutines)
     languages = [list(langs.keys()) for _, langs in language_results]
     for index, langlist in enumerate(languages):
-        reporesponse[1][index]["languages"] = langlist if langlist else None
+        reporesponse[1][index]["languages"] = langlist if langlist else []
 
     outputSlice["count"] = len(reporesponse[1])
     outputSlice["updated"] = int(time())

@@ -1,9 +1,7 @@
-from typing_extensions import (
-    TypedDict,
-    Optional,
-)
+from typing_extensions import TypedDict, Optional
 
 from pydantic import BaseModel, EmailStr, HttpUrl, PastDatetime
+
 
 UserJSONSchema = {
     "oneOf": [
@@ -328,18 +326,18 @@ class UserJSON(TypedDict, total=False):
     updated_at: PastDatetime
 
     # Optional fields (not in required array)
-    user_view_type: Optional[str] = None
-    notification_email: Optional[EmailStr] = None
-    twitter_username: Optional[str] = None
-    plan: Optional[UserPlanJSON] = None
-    private_gists: Optional[int] = None
-    total_private_repos: Optional[int] = None
-    owned_private_repos: Optional[int] = None
-    disk_usage: Optional[int] = None
-    collaborators: Optional[int] = None
-    two_factor_authentication: Optional[bool] = True
-    business_plus: Optional[bool] = False
-    ldap_dn: Optional[str] = None
+    user_view_type: Optional[str]
+    notification_email: Optional[EmailStr]
+    twitter_username: Optional[str]
+    plan: Optional[UserPlanJSON]
+    private_gists: Optional[int]
+    total_private_repos: Optional[int]
+    owned_private_repos: Optional[int]
+    disk_usage: Optional[int]
+    collaborators: Optional[int]
+    two_factor_authentication: Optional[bool]
+    business_plus: Optional[bool]
+    ldap_dn: Optional[str]
 
 
 class User(BaseModel):
@@ -505,8 +503,8 @@ class SimpleUserJSON(TypedDict):
     A simple GitHub user.
     """
 
-    name: Optional[str] = None
-    email: Optional[str] = None
+    name: Optional[str]
+    email: Optional[str]
     login: str
     id: int
     node_id: str
@@ -525,8 +523,8 @@ class SimpleUserJSON(TypedDict):
     received_events_url: HttpUrl  # has "format": "uri"
     type: str
     site_admin: bool
-    starred_at: Optional[str] = None
-    user_view_type: Optional[str] = None
+    starred_at: Optional[str]
+    user_view_type: Optional[str]
 
 
 class SimpleUser(BaseModel):

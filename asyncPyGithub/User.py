@@ -1,17 +1,11 @@
-from typing import Any
-
-from types import (
-    CoroutineType,
-)
-
-from _types import (
+from ._types import (
     ErrorMessage,
     User,
     UserJSON,
     SimpleUser,
 )
 
-from base import req, write_json, CACHE_DIR
+from asyncPyGithub.base import req
 
 from requests import get, patch
 
@@ -136,42 +130,10 @@ async def all(
     return (res.status_code, [SimpleUser(**user) for user in res.json()])
 
 
-User.update = update
-User.authenticate = staticmethod(authenticate)
-User.get_by_id = staticmethod(get_by_id)
-User.get_by_username = staticmethod(get_by_username)
-User.all = staticmethod(all)
+setattr(User, "update", update)
+setattr(User, "authenticate", staticmethod(authenticate))
+setattr(User, "get_by_id", staticmethod(get_by_id))
+setattr(User, "get_by_username", staticmethod(get_by_username))
+setattr(User, "all", staticmethod(all))
 
 UserQueryReturnable = tuple[int, User | SimpleUser | list[SimpleUser] | ErrorMessage]
-
-
-if __name__ == "__main__":
-    import asyncio
-
-    async def main():
-        status_code, user = await User.authenticate()
-        if status_code != 200:
-            print(f">> Error: {user.message} (Code: {user.code})")
-            return
-
-        changes = {
-            "description": "Swedish developer - Network Security and Hardware Programming | Developer @ CherryTe.ch and HereYouGoPup.com",
-        }
-
-        awaitables: list[CoroutineType[UserQueryReturnable, Any, Any]] = [
-            user.update(changes),
-            User.get_by_id(user.id),
-            User.get_by_username(user.login),
-            User.all(since=0, per_page=5),
-        ]
-        results = await asyncio.gather(*awaitables)
-
-        write_json(
-            CACHE_DIR / "user_by_username.json", results[2][1].model_dump(mode="json")
-        )
-
-        for result in results:
-            stat, user_or_error = result
-            print(f">> Status Code: {stat}")
-
-    asyncio.run(main())

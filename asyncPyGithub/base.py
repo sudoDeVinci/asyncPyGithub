@@ -8,7 +8,7 @@ import asyncio
 from threading import Lock
 from json import dump, JSONDecodeError, load
 
-from _types import User, RepoSlice
+from ._types import User, RepoSlice
 
 LOGGER: Logger = getLogger(__name__)
 LOGGER.setLevel("INFO")
