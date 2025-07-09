@@ -5,10 +5,7 @@ from asyncPyGithub import (
     CACHE_DIR,
     GitHubUserPortal,
     UserQueryReturnable,
-    PrivateUser,
-    ErrorMessage,
-    MinimalRepository,
-    GitHubRepositoryPortal
+    GitHubRepositoryPortal,
 )
 
 
@@ -47,12 +44,14 @@ if __name__ == "__main__":
             CACHE_DIR / "user_by_username.json", results[2][1].model_dump(mode="json")
         )
 
-        write_json(
-            CACHE_DIR / "hovercard.json", results[4][1].model_dump(mode="json")
-        )
+        write_json(CACHE_DIR / "hovercard.json", results[4][1].model_dump(mode="json"))
 
         repo_out = results[5][1]
-        serialized = [repo.model_dump(mode="json") for repo in repo_out] if isinstance(repo_out, list) else repo_out.model_dump(mode="json")
+        serialized = (
+            [repo.model_dump(mode="json") for repo in repo_out]
+            if isinstance(repo_out, list)
+            else repo_out.model_dump(mode="json")
+        )
         write_json(
             CACHE_DIR / "repos.json",
             serialized,
@@ -63,7 +62,3 @@ if __name__ == "__main__":
             print(f">> Status Code: {stat}")
 
     asyncio.run(main())
-
-
-
-

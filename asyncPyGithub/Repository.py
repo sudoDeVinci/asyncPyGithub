@@ -1,17 +1,11 @@
 from requests import get
-from time import time
-import asyncio
-from types import CoroutineType
-from typing import cast, Any, Literal, Sequence
 from typing_extensions import Self
-from asyncPyGithub.base import req, LOGGER
+from asyncPyGithub.base import req
 from ._types import (
     ErrorMessage,
     RepositoryType,
     RepoSortDirection,
     RepoSortCriterion,
-    RepoVisibility,
-    MinimalRepositoryJSON,
     MinimalRepository,
     GitHubPortal,
     needs_authentication,
@@ -75,5 +69,3 @@ class GitHubRepositoryPortal(GitHubPortal):
                 ),
             )
         return (res.status_code, [MinimalRepository(**repo) for repo in res.json()])
-
-

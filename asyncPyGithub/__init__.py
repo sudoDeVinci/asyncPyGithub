@@ -6,12 +6,8 @@ from ._types import (
     SimpleUserJSON,
     SimpleUser,
     PrivateUser,
-)
-
-from .Repository import (
     MinimalRepositoryJSON,
     MinimalRepository,
-    GitHubRepositoryPortal
 )
 
 from .base import (
@@ -22,11 +18,9 @@ from .base import (
 )
 
 
-from .User import (
-    GitHubUserPortal,
-    UserQueryReturnable
-)
-    
+from .User import GitHubUserPortal, UserQueryReturnable
+
+from .Repository import GitHubRepositoryPortal
 
 __all__ = (
     "UserQueryReturnable",

@@ -565,23 +565,14 @@ HoverCardSchema = {
             "items": {
                 "type": "object",
                 "properties": {
-                "message": {
-                    "type": "string"
+                    "message": {"type": "string"},
+                    "octicon": {"type": "string"},
                 },
-                "octicon": {
-                    "type": "string"
-                }
-                },
-                "required": [
-                "message",
-                "octicon"
-                ]
-            }
+                "required": ["message", "octicon"],
+            },
         }
     },
-    "required": [
-        "contexts"
-    ]
+    "required": ["contexts"],
 }
 
 
@@ -617,7 +608,3 @@ class HoverCard(TypedDict):
     """
 
     contexts: list[HoverCardContext]
-
-
-
-

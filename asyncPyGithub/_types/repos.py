@@ -11,11 +11,7 @@ from typing import (
 
 from datetime import datetime
 
-from .users import (
-    SimpleUserJSON,
-    SimpleUser
-)
-
+from .users import SimpleUserJSON, SimpleUser
 
 
 RepositoryType = Literal[
@@ -50,6 +46,7 @@ The visibility of repositories when querying GitHub.
 Usually defaults to 'all'.
 """
 
+
 # TypedDict definitions
 class PermissionsJSON(TypedDict):
     admin: bool
@@ -58,12 +55,14 @@ class PermissionsJSON(TypedDict):
     triage: bool
     pull: bool
 
+
 class CodeOfConductJSON(TypedDict):
     key: str
     name: str
     url: str
     body: str
     html_url: Optional[str]
+
 
 class LicenseJSON(TypedDict):
     key: str
@@ -72,8 +71,10 @@ class LicenseJSON(TypedDict):
     url: str
     node_id: str
 
+
 class SecurityStatusJSON(TypedDict):
     status: Literal["enabled", "disabled"]
+
 
 class SecurityAndAnalysisJSON(TypedDict, total=False):
     advanced_security: SecurityStatusJSON
@@ -83,6 +84,7 @@ class SecurityAndAnalysisJSON(TypedDict, total=False):
     secret_scanning_push_protection: SecurityStatusJSON
     secret_scanning_non_provider_patterns: SecurityStatusJSON
     secret_scanning_ai_detection: SecurityStatusJSON
+
 
 class MinimalRepositoryJSON(TypedDict):
     # Required fields
@@ -132,7 +134,7 @@ class MinimalRepositoryJSON(TypedDict):
     tags_url: str
     teams_url: str
     trees_url: str
-    
+
     # Optional fields
     git_url: NotRequired[str]
     ssh_url: NotRequired[str]
@@ -177,6 +179,7 @@ class MinimalRepositoryJSON(TypedDict):
     security_and_analysis: NotRequired[Optional[SecurityAndAnalysisJSON]]
     custom_properties: NotRequired[Dict[str, Any]]
 
+
 # Pydantic models
 class Permissions(BaseModel):
     admin: bool
@@ -185,12 +188,14 @@ class Permissions(BaseModel):
     triage: bool
     pull: bool
 
+
 class CodeOfConduct(BaseModel):
     key: str
     name: str
     url: HttpUrl
     body: str
     html_url: Optional[HttpUrl] = None
+
 
 class License(BaseModel):
     key: str
@@ -199,8 +204,10 @@ class License(BaseModel):
     node_id: str
     url: Optional[HttpUrl] = None
 
+
 class SecurityStatus(BaseModel):
     status: Literal["enabled", "disabled"]
+
 
 class SecurityAndAnalysis(BaseModel):
     advanced_security: Optional[SecurityStatus] = None
@@ -210,6 +217,7 @@ class SecurityAndAnalysis(BaseModel):
     secret_scanning_push_protection: Optional[SecurityStatus] = None
     secret_scanning_non_provider_patterns: Optional[SecurityStatus] = None
     secret_scanning_ai_detection: Optional[SecurityStatus] = None
+
 
 class MinimalRepository(BaseModel):
     # Required fields
@@ -259,7 +267,7 @@ class MinimalRepository(BaseModel):
     tags_url: HttpUrl
     teams_url: HttpUrl
     trees_url: str
-    
+
     # Optional fields
     git_url: Optional[str] = None
     ssh_url: Optional[str] = None

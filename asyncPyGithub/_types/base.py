@@ -1,4 +1,5 @@
-from typing_extensions import Self, Generic, TypeVar, Callable, Any
+from typing_extensions import Self, Callable, Any
+from collections.abc import Coroutine as CoroutineType
 from pydantic import EmailStr, HttpUrl, PastDatetime
 
 
@@ -40,10 +41,11 @@ class ErrorMessage:
         """
         return self.model_dump()
 
+
 class GitHubPortal:
-    
+
     _authenticated: bool = False
-    
+
     __slots__ = ()
 
     def __init__(self):
@@ -58,10 +60,12 @@ class GitHubPortal:
         return self._authenticated
 
 
-def needs_authentication(function: Callable[..., Any]) -> Callable[..., Any]:
+def needs_authentication(
+    function: Callable[..., Any],
+) -> classmethod[GitHubPortal, [Any], CoroutineType[Any, Any, Any]]:
     async def wrapper(cls: type[GitHubPortal], *args, **kwargs) -> Any:
         # Special case: allow authenticate() to run without being authenticated
-        if function.__name__ == 'authenticate':
+        if function.__name__ == "authenticate":
             return await function(cls, *args, **kwargs)
 
         if not cls._authenticated:
@@ -73,7 +77,7 @@ def needs_authentication(function: Callable[..., Any]) -> Callable[..., Any]:
                     endpoint=kwargs.get("endpoint", None),
                 ),
             )
-        
+
         return await function(cls, *args, **kwargs)
 
     return classmethod(wrapper)
