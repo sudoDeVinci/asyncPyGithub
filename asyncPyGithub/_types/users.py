@@ -1,5 +1,4 @@
 from typing_extensions import TypedDict, Optional
-
 from pydantic import BaseModel, EmailStr, HttpUrl, PastDatetime
 
 
@@ -287,7 +286,7 @@ class UserPlanJSON(TypedDict):
     private_repos: int
 
 
-class UserJSON(TypedDict, total=False):
+class PrivateUserJSON(TypedDict, total=False):
     """
     A GitHub User.
     """
@@ -340,7 +339,7 @@ class UserJSON(TypedDict, total=False):
     ldap_dn: Optional[str]
 
 
-class User(BaseModel):
+class PrivateUser(BaseModel):
     """
     A GitHub User.
     """
@@ -554,3 +553,71 @@ class SimpleUser(BaseModel):
     site_admin: bool
     starred_at: Optional[str] = None
     user_view_type: Optional[str] = None
+
+
+HoverCardSchema = {
+    "title": "Hovercard",
+    "description": "Hovercard",
+    "type": "object",
+    "properties": {
+        "contexts": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "octicon": {
+                    "type": "string"
+                }
+                },
+                "required": [
+                "message",
+                "octicon"
+                ]
+            }
+        }
+    },
+    "required": [
+        "contexts"
+    ]
+}
+
+
+class HoverCardContextJSON(TypedDict):
+    """
+    A context for a GitHub Hovercard.
+    """
+
+    message: str
+    octicon: str
+
+
+class HoverCardContext(BaseModel):
+    """
+    A context for a GitHub Hovercard.
+    """
+
+    message: str
+    octicon: str
+
+
+class HoverCardJSON(TypedDict):
+    """
+    A GitHub Hovercard.
+    """
+
+    contexts: list[HoverCardContextJSON]
+
+
+class HoverCard(TypedDict):
+    """
+    A GitHub Hovercard.
+    """
+
+    contexts: list[HoverCardContext]
+
+
+
+

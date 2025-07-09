@@ -1,6 +1,8 @@
 from .base import (
     ErrorMessage,
     JSONDict,
+    GitHubPortal,
+    needs_authentication,
 )
 
 from .repos import (
@@ -8,36 +10,42 @@ from .repos import (
     RepoSortCriterion,
     RepoSortDirection,
     RepoVisibility,
-    Repository,
-    RepoSlice,
-    ContentFile,
+    MinimalRepositoryJSON,
+    MinimalRepository,
 )
 
 from .users import (
     UserPlanJSON,
-    UserJSONSchema,
-    UserJSON,
-    User,
-    SimpleUserJSONSchema,
+    PrivateUserJSON,
+    PrivateUser,
     SimpleUserJSON,
     SimpleUser,
+    HoverCardJSON,
+    HoverCard,
+    HoverCardContextJSON,
+    HoverCardContext,
 )
 
 __all__ = (
     "ErrorMessage",
     "JSONDict",
+    "UserPlanJSON",
+    "PrivateUserJSON",
+    "PrivateUser",
+    "UserJSONSchema",
+    "SimpleUserJSON",
+    "SimpleUser",
+    "HoverCardSchema",
+    "HoverCardJSON",
+    "HoverCard",
+    "HoverCardContextJSON",
+    "HoverCardContext",
     "RepositoryType",
     "RepoSortCriterion",
     "RepoSortDirection",
     "RepoVisibility",
-    "Repository",
-    "RepoSlice",
-    "ContentFile",
-    "UserPlanJSON",
-    "UserJSON",
-    "User",
-    "UserJSONSchema",
-    "SimpleUserJSONSchema",
-    "SimpleUserJSON",
-    "SimpleUser",
+    "MinimalRepositoryJSON",
+    "MinimalRepository",
+    "GitHubPortal",
+    "needs_authentication",
 )

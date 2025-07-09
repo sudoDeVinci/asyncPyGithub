@@ -8,8 +8,6 @@ import asyncio
 from threading import Lock
 from json import dump, JSONDecodeError, load
 
-from ._types import User, RepoSlice
-
 LOGGER: Logger = getLogger(__name__)
 LOGGER.setLevel("INFO")
 
@@ -20,9 +18,6 @@ makedirs(CACHE_DIR, exist_ok=True)
 
 REPOSLICE_JSON: Final[Path] = CACHE_DIR / "repos.json"
 USER_JSON: Final[Path] = CACHE_DIR / "users.json"
-
-REPO_CACHE: RepoSlice | None = None
-USER_CACHE: User | None = None
 
 REPO_CACHE_LOCK: Lock = Lock()
 USER_CACHE_LOCK: Lock = Lock()

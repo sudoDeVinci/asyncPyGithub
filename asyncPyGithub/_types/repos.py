@@ -1,11 +1,21 @@
+from pydantic import BaseModel, HttpUrl
 from typing import (
     TypedDict,
     NotRequired,
     Literal,
+    List,
+    Optional,
+    Any,
+    Dict,
 )
 
-from .users import UserJSON
-from .base import ErrorMessage
+from datetime import datetime
+
+from .users import (
+    SimpleUserJSON,
+    SimpleUser
+)
+
 
 
 RepositoryType = Literal[
@@ -40,220 +50,260 @@ The visibility of repositories when querying GitHub.
 Usually defaults to 'all'.
 """
 
+# TypedDict definitions
+class PermissionsJSON(TypedDict):
+    admin: bool
+    maintain: bool
+    push: bool
+    triage: bool
+    pull: bool
 
-class Repository(TypedDict, total=False):
-    """
-    A GitHub repository with essential details.
+class CodeOfConductJSON(TypedDict):
+    key: str
+    name: str
+    url: str
+    body: str
+    html_url: Optional[str]
 
-    Attributes:
-        id (int): The unique identifier for the repository.
-        node_id (str): The node ID of the repository.
-        name (str): The name of the repository.
-        full_name (str): The full name of the repository, including the owner's username.
-        private (bool): Whether the repository is private.
-        owner (User): The owner of the repository, represented as a User object.
-        html_url (str): The URL to the repository on GitHub.
-        description (str | None): A brief description of the repository, if available.
-        fork (bool): Whether the repository is a fork of another repository.
-        url (str): The API URL for the repository.
-        forks_url (str): The URL to fetch forks of this repository.
-        keys_url (str): The URL to fetch keys associated with this repository.
-        collaborators_url (str): The URL to fetch collaborators of this repository.
-        teams_url (str): The URL to fetch teams associated with this repository.
-        hooks_url (str): The URL to fetch webhooks for this repository.
-        issue_events_url (str): The URL to fetch issue events for this repository.
-        events_url (str): The URL to fetch public events for this repository.
-        assignees_url (str): The URL to fetch assignees for issues in this repository.
-        branches_url (str): The URL to fetch branches in this repository.
-        tags_url (str): The URL to fetch tags in this repository.
-        blobs_url (str): The URL to fetch blobs in this repository.
-        git_tags_url (str): The URL to fetch git tags in this repository.
-        git_refs_url (str): The URL to fetch git references in this repository.
-        trees_url (str): The URL to fetch trees in this repository.
-        statuses_url (str): The URL to fetch commit statuses in this repository.
-        languages_url (str): The URL to fetch programming languages used in this repository.
-        stargazers_url (str): The URL to fetch stargazers of this repository.
-        contributors_url (str): The URL to fetch contributors of this repository.
-        subscribers_url (str): The URL to fetch subscribers of this repository.
-        subscription_url (str): The URL for managing subscriptions for this repository.
-        commits_url (str): The URL to fetch commits in this repository.
-        git_commits_url (str): The URL to fetch git commits in this repository.
-        comments_url (str): The URL to fetch comments in this repository.
-        issue_comment_url (str): The URL to fetch issue comments in this repository.
-        contents_url (str): The URL to fetch contents of this repository.
-        compare_url (str): The URL to compare commits in this repository.
-        merges_url (str): The URL to fetch merge information for this repository.
-        archive_url (str): The URL to fetch archived contents of this repository.
-        downloads_url (str): The URL to fetch downloads associated with this repository.
-        issues_url (str): The URL to fetch issues in this repository.
-        pulls_url (str): The URL to fetch pull requests in this repository.
-        milestones_url (str): The URL to fetch milestones in this repository.
-        notifications_url (str): The URL to fetch notifications for this repository.
-        labels_url (str): The URL to fetch labels in this repository.
-        releases_url (str): The URL to fetch releases in this repository.
-        deployments_url (str): The URL to fetch deployments for this repository.
-        created_at (str): Timestamp when the repository was created.
-        updated_at (str): Timestamp when the repository was last updated.
-        pushed_at (str): Timestamp when the repository was last pushed to.
-        git_url (str): The Git URL for the repository.
-        ssh_url (str): The SSH URL for the repository.
-        clone_url (str): The HTTPS URL for cloning the repository.
-        svn_url (str): The SVN URL for the repository.
-        homepage (str | None): The homepage URL for the repository, if available.
-        size (int): The size of the repository in kilobytes.
-        stargazers_count (int): The number of stars the repository has received.
-        watchers_count (int): The number of watchers for the repository.
-        language (str | None): The primary programming language of the repository, if available.
-        has_issues (bool): Whether the repository has issues enabled.
-        has_projects (bool): Whether the repository has projects enabled.
-        has_downloads (bool): Whether the repository allows downloads.
-        has_wiki (bool): Whether the repository has a wiki enabled.
-        has_pages (bool): Whether the repository has GitHub Pages enabled.
-        has_discussions (bool): Whether the repository has discussions enabled.
-        forks_count (int): The number of forks of this repository.
-        mirror_url (str | None): The mirror URL of the repository, if available.
-        archived (bool): Whether the repository is archived.
-        disabled (bool): Whether the repository is disabled.
-        open_issues_count (int): The number of open issues in the repository.
-        license (dict[str, str | None] | None): Information about the repository's license, if available.
-        allow_forking (bool): Whether forking is allowed for this repository.
-        is_template (bool): Whether the repository is a template.
-        web_commit_signoff_required (bool): Whether web commit signoff is required for this repository.
-        topics (list[str]): A list of topics associated with the repository.
-        visibility (str): The visibility of the repository (e.g., "public", "private").
-        forks (int): The number of forks of this repository.
-        open_issues (int): The number of open issues in this repository.
-        watchers (int): The number of watchers for this repository.
-        default_branch (str): The default branch of the repository.
-        permissions (dict[str, bool] | None): Permissions for the authenticated user on this repository.
-    """
+class LicenseJSON(TypedDict):
+    key: str
+    name: str
+    spdx_id: str
+    url: str
+    node_id: str
 
+class SecurityStatusJSON(TypedDict):
+    status: Literal["enabled", "disabled"]
+
+class SecurityAndAnalysisJSON(TypedDict, total=False):
+    advanced_security: SecurityStatusJSON
+    code_security: SecurityStatusJSON
+    dependabot_security_updates: SecurityStatusJSON
+    secret_scanning: SecurityStatusJSON
+    secret_scanning_push_protection: SecurityStatusJSON
+    secret_scanning_non_provider_patterns: SecurityStatusJSON
+    secret_scanning_ai_detection: SecurityStatusJSON
+
+class MinimalRepositoryJSON(TypedDict):
+    # Required fields
     id: int
     node_id: str
     name: str
     full_name: str
+    owner: SimpleUserJSON
     private: bool
-    owner: UserJSON
-    html_url: str
-    description: str | None
+    html_url: HttpUrl
+    description: Optional[str]
     fork: bool
-    url: str
-    forks_url: str
-    keys_url: str
-    collaborators_url: str
-    teams_url: str
-    hooks_url: str
-    issue_events_url: str
-    events_url: str
-    assignees_url: str
-    branches_url: str
-    tags_url: str
-    blobs_url: str
-    git_tags_url: str
-    git_refs_url: str
-    trees_url: str
-    statuses_url: str
-    languages_url: str
-    stargazers_url: str
-    contributors_url: str
-    subscribers_url: str
-    subscription_url: str
-    commits_url: str
-    git_commits_url: str
-    comments_url: str
-    issue_comment_url: str
-    contents_url: str
-    compare_url: str
-    merges_url: str
+    url: HttpUrl
     archive_url: str
-    downloads_url: str
+    assignees_url: str
+    blobs_url: str
+    branches_url: str
+    collaborators_url: str
+    comments_url: str
+    commits_url: HttpUrl
+    compare_url: HttpUrl
+    contents_url: HttpUrl
+    contributors_url: HttpUrl
+    deployments_url: HttpUrl
+    downloads_url: HttpUrl
+    events_url: str
+    forks_url: str
+    git_commits_url: str
+    git_refs_url: str
+    git_tags_url: str
+    hooks_url: str
+    issue_comment_url: str
+    issue_events_url: str
     issues_url: str
-    pulls_url: str
+    keys_url: str
+    labels_url: str
+    languages_url: str
+    merges_url: str
     milestones_url: str
     notifications_url: str
-    labels_url: str
+    pulls_url: str
     releases_url: str
-    deployments_url: str
-    created_at: str
-    updated_at: str
-    pushed_at: str
-    git_url: str
-    ssh_url: str
-    clone_url: str
-    svn_url: str
-    homepage: str | None
-    size: int
-    stargazers_count: int
-    watchers_count: int
-    language: str | None
-    languages: NotRequired[list[str]]
-    has_issues: bool
-    has_projects: bool
-    has_downloads: bool
-    has_wiki: bool
-    has_pages: bool
-    has_discussions: bool
-    forks_count: int
-    mirror_url: str | None
-    archived: bool
-    disabled: bool
-    open_issues_count: int
-    license: dict[str, str | None] | None
-    allow_forking: bool
-    is_template: bool
-    web_commit_signoff_required: bool
-    topics: list[str]
-    visibility: str
-    forks: int
-    open_issues: int
-    watchers: int
-    default_branch: str
-    permissions: dict[str, bool] | None
+    stargazers_url: str
+    statuses_url: str
+    subscribers_url: str
+    subscription_url: str
+    tags_url: str
+    teams_url: str
+    trees_url: str
+    
+    # Optional fields
+    git_url: NotRequired[str]
+    ssh_url: NotRequired[str]
+    clone_url: NotRequired[str]
+    mirror_url: NotRequired[Optional[str]]
+    svn_url: NotRequired[str]
+    homepage: NotRequired[Optional[str]]
+    language: NotRequired[Optional[str]]
+    forks_count: NotRequired[int]
+    stargazers_count: NotRequired[int]
+    watchers_count: NotRequired[int]
+    size: NotRequired[int]
+    default_branch: NotRequired[str]
+    open_issues_count: NotRequired[int]
+    is_template: NotRequired[bool]
+    topics: NotRequired[List[str]]
+    has_issues: NotRequired[bool]
+    has_projects: NotRequired[bool]
+    has_wiki: NotRequired[bool]
+    has_pages: NotRequired[bool]
+    has_downloads: NotRequired[bool]
+    has_discussions: NotRequired[bool]
+    archived: NotRequired[bool]
+    disabled: NotRequired[bool]
+    visibility: NotRequired[str]
+    pushed_at: NotRequired[Optional[str]]
+    created_at: NotRequired[Optional[str]]
+    updated_at: NotRequired[Optional[str]]
+    permissions: NotRequired[PermissionsJSON]
+    role_name: NotRequired[str]
+    temp_clone_token: NotRequired[str]
+    delete_branch_on_merge: NotRequired[bool]
+    subscribers_count: NotRequired[int]
+    network_count: NotRequired[int]
+    code_of_conduct: NotRequired[CodeOfConductJSON]
+    license: NotRequired[Optional[LicenseJSON]]
+    forks: NotRequired[int]
+    open_issues: NotRequired[int]
+    watchers: NotRequired[int]
+    allow_forking: NotRequired[bool]
+    web_commit_signoff_required: NotRequired[bool]
+    security_and_analysis: NotRequired[Optional[SecurityAndAnalysisJSON]]
+    custom_properties: NotRequired[Dict[str, Any]]
 
+# Pydantic models
+class Permissions(BaseModel):
+    admin: bool
+    maintain: bool
+    push: bool
+    triage: bool
+    pull: bool
 
-class ContentFile(TypedDict, total=False):
-    """
-    Represents a file in a GitHub repository with essential details.
-
-    Attributes:
-        name (str): The name of the file.
-        type (str): The type of the file (e.g., "file", "dir").
-        size (int): The size of the file in bytes.
-        encoding (str): The encoding of the file content.
-        content (str): The base64 encoded content of the file.
-        sha (str): The SHA hash of the file.
-        url (str): The API URL to access the file.
-        html_url (str): The HTML URL to view the file on GitHub.
-        git_url (str): The Git URL for the file.
-        download_url (str | None): The URL to download the file, if available.
-        _links (dict[str, str]): Links related to the file, such as self, git, and html URLs.
-    """
-
+class CodeOfConduct(BaseModel):
+    key: str
     name: str
-    type: str
-    size: int
-    encoding: str
-    content: str
-    sha: str
-    url: str
-    html_url: str
-    git_url: str
-    download_url: str | None
-    _links: dict[str, str]
+    url: HttpUrl
+    body: str
+    html_url: Optional[HttpUrl] = None
+
+class License(BaseModel):
+    key: str
+    name: str
+    spdx_id: str
+    node_id: str
+    url: Optional[HttpUrl] = None
+
+class SecurityStatus(BaseModel):
+    status: Literal["enabled", "disabled"]
+
+class SecurityAndAnalysis(BaseModel):
+    advanced_security: Optional[SecurityStatus] = None
+    code_security: Optional[SecurityStatus] = None
+    dependabot_security_updates: Optional[SecurityStatus] = None
+    secret_scanning: Optional[SecurityStatus] = None
+    secret_scanning_push_protection: Optional[SecurityStatus] = None
+    secret_scanning_non_provider_patterns: Optional[SecurityStatus] = None
+    secret_scanning_ai_detection: Optional[SecurityStatus] = None
+
+class MinimalRepository(BaseModel):
+    # Required fields
+    id: int
+    node_id: str
+    name: str
+    full_name: str
+    owner: SimpleUser
+    private: bool
+    html_url: HttpUrl
+    description: Optional[str]
+    fork: bool
+    url: HttpUrl
+    archive_url: str
+    assignees_url: str
+    blobs_url: str
+    branches_url: str
+    collaborators_url: str
+    comments_url: str
+    commits_url: str
+    compare_url: str
+    contents_url: str
+    contributors_url: HttpUrl
+    deployments_url: HttpUrl
+    downloads_url: HttpUrl
+    events_url: HttpUrl
+    forks_url: HttpUrl
+    git_commits_url: str
+    git_refs_url: str
+    git_tags_url: str
+    hooks_url: HttpUrl
+    issue_comment_url: str
+    issue_events_url: str
+    issues_url: str
+    keys_url: str
+    labels_url: str
+    languages_url: HttpUrl
+    merges_url: HttpUrl
+    milestones_url: str
+    notifications_url: str
+    pulls_url: str
+    releases_url: str
+    stargazers_url: HttpUrl
+    statuses_url: str
+    subscribers_url: HttpUrl
+    subscription_url: HttpUrl
+    tags_url: HttpUrl
+    teams_url: HttpUrl
+    trees_url: str
+    
+    # Optional fields
+    git_url: Optional[str] = None
+    ssh_url: Optional[str] = None
+    clone_url: Optional[str] = None
+    mirror_url: Optional[str] = None
+    svn_url: Optional[str] = None
+    homepage: Optional[str] = None
+    language: Optional[str] = None
+    forks_count: Optional[int] = None
+    stargazers_count: Optional[int] = None
+    watchers_count: Optional[int] = None
+    size: Optional[int] = None
+    default_branch: Optional[str] = None
+    open_issues_count: Optional[int] = None
+    is_template: Optional[bool] = None
+    topics: Optional[List[str]] = None
+    has_issues: Optional[bool] = None
+    has_projects: Optional[bool] = None
+    has_wiki: Optional[bool] = None
+    has_pages: Optional[bool] = None
+    has_downloads: Optional[bool] = None
+    has_discussions: Optional[bool] = None
+    archived: Optional[bool] = None
+    disabled: Optional[bool] = None
+    visibility: Optional[str] = None
+    pushed_at: Optional[datetime] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    permissions: Optional[Permissions] = None
+    role_name: Optional[str] = None
+    temp_clone_token: Optional[str] = None
+    delete_branch_on_merge: Optional[bool] = None
+    subscribers_count: Optional[int] = None
+    network_count: Optional[int] = None
+    code_of_conduct: Optional[CodeOfConduct] = None
+    license: Optional[License] = None
+    forks: Optional[int] = None
+    open_issues: Optional[int] = None
+    watchers: Optional[int] = None
+    allow_forking: Optional[bool] = None
+    web_commit_signoff_required: Optional[bool] = None
+    security_and_analysis: Optional[SecurityAndAnalysis] = None
+    custom_properties: Optional[Dict[str, Any]] = None
 
 
-class RepoSlice(TypedDict, total=False):
-    """
-    Represents a slice of GitHub repositories with metadata.
-
-    Attributes:
-        count (int): The total number of repositories in this slice.
-        updated (int): The timestamp when this slice was last updated.
-        repos (list[RepoGist | Repository]): A list of repositories.
-        errors (list[ErrorMessage] | None): A list of error messages, if any.
-    """
-
-    count: int
-    updated: int
-    repos: list[Repository]
-    errors: list[ErrorMessage] | None
+class FullRepositoryJSON(TypedDict, total=False):
+    pass

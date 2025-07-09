@@ -1,4 +1,6 @@
+from typing_extensions import Self, Generic, TypeVar, Callable, Any
 from pydantic import EmailStr, HttpUrl, PastDatetime
+
 
 JSONDict = dict[str, str | int | bool | EmailStr | HttpUrl | PastDatetime | None]
 
@@ -37,3 +39,41 @@ class ErrorMessage:
             JSONDict: A dictionary representation of the error message.
         """
         return self.model_dump()
+
+class GitHubPortal:
+    
+    _authenticated: bool = False
+    
+    __slots__ = ()
+
+    def __init__(self):
+        pass
+
+    @property
+    def authenticated(self: Self) -> bool:
+        """
+        Check if the user is authenticated.
+        Returns True if the user is authenticated, False otherwise.
+        """
+        return self._authenticated
+
+
+def needs_authentication(function: Callable[..., Any]) -> Callable[..., Any]:
+    async def wrapper(cls: type[GitHubPortal], *args, **kwargs) -> Any:
+        # Special case: allow authenticate() to run without being authenticated
+        if function.__name__ == 'authenticate':
+            return await function(cls, *args, **kwargs)
+
+        if not cls._authenticated:
+            return (
+                401,
+                ErrorMessage(
+                    code=401,
+                    message="User is not authenticated. Please call authenticate() first.",
+                    endpoint=kwargs.get("endpoint", None),
+                ),
+            )
+        
+        return await function(cls, *args, **kwargs)
+
+    return classmethod(wrapper)
