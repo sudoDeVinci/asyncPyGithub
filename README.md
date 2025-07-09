@@ -31,10 +31,10 @@ GITHUB_TOKEN=your_github_token_here
 
 ```py
 import asyncio
-from asyncpygithub import User
+from asyncPyGithub import GitHubUserPortal
 
 async def main():
-    status, user = await User.authenticate()
+    status, user = await GitHubUserPortal.authenticate()
     if status == 200:
         print(f"Hello, {user.login}!")
     else:
@@ -50,13 +50,13 @@ Calling multiple methods with little to no overlap benefit greatly from concurre
 For example, we can call these (3) methods one by one:
 
 ```py
-from asyncpygithub import User
+from asyncPyGithub import GitHubUserPortal
 
 async def one_by_one_example() ->None:
-    await User.get_by_id( ... )
-    await User.get_by_username( ... )
-    await User.all( ... )
-        
+    await GitHubUserPortal.get_by_id( ... )
+    await GitHubUserPortal.get_by_username( ... )
+    await GitHubUserPortal.all( ... )
+
         ...
 ```
 
@@ -64,11 +64,16 @@ However, this is no better than the synchronous equivalent.
 To get the full benefits, we can use `asyncio.gather` like so:
 
 ```py
+from asyncPyGithub import GitHubUserPortal
+
 async def async_gathered_example() -> None:
-    awaitables:list[CoroutineType[Any, Any, UserQueryReturnable]] = (
-        User.get_by_id( ... )
-        User.get_by_username( ... )
-        User.all( ... )
-    )
+    awaitables: list[CoroutineType[Any, Any, UserQueryReturnable]] = [
+        GitHubUserPortal.get_by_id( ... ),
+        GitHubUserPortal.get_by_username( ... ),
+        GitHubUserPortal.all( ... ),
+    ]
     results = await asyncio.gather(*awaitables)
+
+        ...
 ```
+
