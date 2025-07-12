@@ -14,11 +14,15 @@ from ._types import (
 from .base import req
 
 from requests import get, patch
+from typing import Final, Literal
 
 
 UserQueryReturnable = tuple[
     int, PrivateUser | SimpleUser | list[SimpleUser] | ErrorMessage
 ]
+
+USER_ENDPOINT: Final[Literal["/user"]] = "/user"
+USERS_ENDPOINT: Final[Literal["/users"]] = "/users"
 
 
 class GitHubUserPortal(GitHubPortal):
@@ -41,7 +45,7 @@ class GitHubUserPortal(GitHubPortal):
                     ErrorMessage(
                         code=res.status_code,
                         message=res.json().get("message", "Unknown error"),
-                        endpoint="/user",
+                        endpoint=USER_ENDPOINT,
                     ),
                 )
 
@@ -60,15 +64,16 @@ class GitHubUserPortal(GitHubPortal):
         This function uses the `/user` endpoint to update the user's information.
         Available: [https://docs.github.com/en/rest/users/users?apiVersion=2022-11-28#update-the-authenticated-user](https://docs.github.com/en/rest/users/users?apiVersion=2022-11-28#update-the-authenticated-user)
         """
+        endpoint = USER_ENDPOINT
         try:
-            res = await req(fn=patch, url="/user", json=changes)
+            res = await req(fn=patch, url=endpoint, json=changes)
             if res.status_code != 200:
                 return (
                     res.status_code,
                     ErrorMessage(
                         code=res.status_code,
                         message=res.json().get("message", "Unknown error"),
-                        endpoint="/user",
+                        endpoint=endpoint,
                     ),
                 )
 
@@ -81,7 +86,7 @@ class GitHubUserPortal(GitHubPortal):
             updated_self = PrivateUser(**updated_json)
 
         except Exception as e:
-            return (500, ErrorMessage(code=500, message=str(e), endpoint="/user"))
+            return (500, ErrorMessage(code=500, message=str(e), endpoint=endpoint))
 
         return (res.status_code, updated_self)
 
@@ -89,22 +94,23 @@ class GitHubUserPortal(GitHubPortal):
     async def get_by_id(
         cls: "GitHubUserPortal", uid: int
     ) -> tuple[int, PrivateUser | ErrorMessage]:
+        endpoint = f"{USER_ENDPOINT}/{uid}"
         try:
-            res = await req(fn=get, url=f"/user/{uid}")
+            res = await req(fn=get, url=endpoint)
             if res.status_code != 200:
                 return (
                     res.status_code,
                     ErrorMessage(
                         code=res.status_code,
                         message=res.json().get("message", "Unknown error"),
-                        endpoint=f"/user/{uid}",
+                        endpoint=endpoint,
                     ),
                 )
 
         except Exception as e:
             return (
                 500,
-                ErrorMessage(code=500, message=str(e), endpoint=f"/user/{uid}"),
+                ErrorMessage(code=500, message=str(e), endpoint=endpoint),
             )
 
         return (res.status_code, PrivateUser(**res.json()))
@@ -113,15 +119,16 @@ class GitHubUserPortal(GitHubPortal):
     async def get_by_username(
         cls: "GitHubUserPortal", username: str
     ) -> tuple[int, PrivateUser | ErrorMessage]:
+        endpoint = f"{USERS_ENDPOINT}/{username}"
         try:
-            res = await req(fn=get, url=f"/users/{username}")
+            res = await req(fn=get, url=endpoint)
             if res.status_code != 200:
                 return (
                     res.status_code,
                     ErrorMessage(
                         code=res.status_code,
                         message=res.json().get("message", "Unknown error"),
-                        endpoint=f"/users/{username}",
+                        endpoint=endpoint,
                     ),
                 )
 
@@ -129,7 +136,7 @@ class GitHubUserPortal(GitHubPortal):
         except Exception as e:
             return (
                 500,
-                ErrorMessage(code=500, message=str(e), endpoint=f"/users/{username}"),
+                ErrorMessage(code=500, message=str(e), endpoint=endpoint),
             )
 
     @needs_authentication
@@ -138,7 +145,9 @@ class GitHubUserPortal(GitHubPortal):
     ) -> tuple[int, list[SimpleUser] | ErrorMessage]:
         try:
             res = await req(
-                fn=get, url="/users", params={"since": since, "per_page": per_page}
+                fn=get,
+                url=USERS_ENDPOINT,
+                params={"since": since, "per_page": per_page},
             )
             if res.status_code != 200:
                 return (
@@ -146,12 +155,15 @@ class GitHubUserPortal(GitHubPortal):
                     ErrorMessage(
                         code=res.status_code,
                         message=res.json().get("message", "Unknown error"),
-                        endpoint="/users",
+                        endpoint=USERS_ENDPOINT,
                     ),
                 )
 
         except Exception as e:
-            return (500, ErrorMessage(code=500, message=str(e), endpoint="/users"))
+            return (
+                500,
+                ErrorMessage(code=500, message=str(e), endpoint=USERS_ENDPOINT),
+            )
 
         return (res.status_code, [SimpleUser(**user) for user in res.json()])
 
@@ -164,16 +176,16 @@ class GitHubUserPortal(GitHubPortal):
         This function uses the `/users/{username}/hovercard` endpoint to get the hovercard information.
         Available: [https://docs.github.com/en/rest/users/users?apiVersion=2022-11-28#view-a-user-hovercard](https://docs.github.com/en/rest/users/users?apiVersion=2022-11-28#view-a-user-hovercard)
         """
-
+        endpoint = f"{USERS_ENDPOINT}/{username}/hovercard"
         try:
-            res = await req(fn=get, url=f"/users/{username}/hovercard")
+            res = await req(fn=get, url=endpoint)
             if res.status_code != 200:
                 return (
                     res.status_code,
                     ErrorMessage(
                         code=res.status_code,
                         message=res.json().get("message", "Unknown error"),
-                        endpoint=f"/users/{username}/hovercard",
+                        endpoint=endpoint,
                     ),
                 )
 
@@ -187,7 +199,5 @@ class GitHubUserPortal(GitHubPortal):
         except Exception as e:
             return (
                 500,
-                ErrorMessage(
-                    code=500, message=str(e), endpoint=f"/users/{username}/hovercard"
-                ),
+                ErrorMessage(code=500, message=str(e), endpoint=endpoint),
             )

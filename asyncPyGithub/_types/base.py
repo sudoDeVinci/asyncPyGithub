@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing_extensions import Self, Callable, Any
 from collections.abc import Coroutine as CoroutineType
 from pydantic import EmailStr, HttpUrl, PastDatetime
@@ -62,7 +63,7 @@ class GitHubPortal:
 
 def needs_authentication(
     function: Callable[..., Any],
-) -> classmethod[GitHubPortal, [Any], CoroutineType[Any, Any, Any]]:
+) -> classmethod[Any, ..., CoroutineType[Any, Any, Any]]:
     async def wrapper(cls: type[GitHubPortal], *args, **kwargs) -> Any:
         # Special case: allow authenticate() to run without being authenticated
         if function.__name__ == "authenticate":

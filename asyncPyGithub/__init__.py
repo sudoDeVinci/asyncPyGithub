@@ -25,7 +25,6 @@ from .Repository import GitHubRepositoryPortal
 __all__ = (
     "UserQueryReturnable",
     "ErrorMessage",
-    "UserJSON",
     "SimpleUserJSON",
     "SimpleUser",
     "UserPlanJSON",
