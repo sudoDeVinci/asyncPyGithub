@@ -31,7 +31,7 @@ class ErrorMessage:
         Returns:
             JSONDict: A dictionary representation of the error message.
         """
-        return {"code": self.code, "message": self.message, "endpoint": self.endpoint}
+        return {"code": self.code, "message": self.message, "endpoint": self.endpoint, "extras": kwargs}
 
     def dict(self) -> JSONDict:
         """
@@ -44,13 +44,14 @@ class ErrorMessage:
 
 
 class GitHubPortal:
+    """
+    Base class for GitHub portals, providing authentication and user management functionality.
+    This class is intended to be subclassed for specific GitHub API interactions.
+    """
 
     _authenticated: bool = False
 
     __slots__ = ()
-
-    def __init__(self):
-        pass
 
     @property
     def authenticated(self: Self) -> bool:
