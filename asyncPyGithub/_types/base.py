@@ -31,7 +31,7 @@ class ErrorMessage:
         Returns:
             JSONDict: A dictionary representation of the error message.
         """
-        return {"code": self.code, "message": self.message, "endpoint": self.endpoint, "extras": kwargs}
+        return {"code": self.code, "message": self.message, "endpoint": self.endpoint}
 
     def dict(self) -> JSONDict:
         """
