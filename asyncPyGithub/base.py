@@ -21,15 +21,15 @@ USER_JSON: Final[Path] = CACHE_DIR / "users.json"
 
 REPO_CACHE_LOCK: Lock = Lock()
 USER_CACHE_LOCK: Lock = Lock()
-
+API_VERSION: Final[str] = "2022-11-28"
+API_ENDPOINT: Final[str] = "https://api.github.com"
+TOKEN: Final[str | None] = None
 
 try:
     assert load_dotenv(
         verbose=True
     ), "Failed to load environment variables from .env file."
     TOKEN: Final[str | None] = environ.get("GITHUB_TOKEN", environ.get("TOKEN", None))
-    API_VERSION: Final[str] = "2022-11-28"
-    API_ENDPOINT: Final[str] = "https://api.github.com"
 
     assert TOKEN is not None, "GITHUB_TOKEN must be set in environment variables."
 except (AssertionError, AttributeError, OSError) as err:
