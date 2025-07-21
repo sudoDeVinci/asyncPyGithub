@@ -54,24 +54,18 @@ async def test_update_usersuccessful(mock_requests: RequestsMock) -> None:
     mock_requests.add(PATCH, url, json=mock_response)
 
     status, resp = await GitHubUserPortal.update(changes)
-    assert status == 200, "Could not update User."    
+    assert status == 200, "Could not update User."
 
 
 @no_type_check
 @mark.asyncio
-async def test_get_by_username_successful(
-    mock_requests: RequestsMock
-) -> None:
-    
+async def test_get_by_username_successful(mock_requests: RequestsMock) -> None:
+
     mock_response = read_json(JSONDIR / "user_by_username.json")
     assert mock_response is not None, "Mock data could not be loaded."
 
     url = f"{USERS_ENDPOINT}/someusername"
-    mock_requests.add(
-        GET,
-        url,
-        json=mock_response
-    )
+    mock_requests.add(GET, url, json=mock_response)
 
-    status, resp = GitHubUserPortal.get_by_username("someusername")
+    status, resp = await GitHubUserPortal.get_by_username("someusername")
     assert status == 200, "Could not get user by username"
