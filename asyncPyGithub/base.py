@@ -27,14 +27,13 @@ try:
     assert load_dotenv(
         verbose=True
     ), "Failed to load environment variables from .env file."
-    TOKEN: Final[str | None] = environ.get("GITHUB_TOKEN", None)
+    TOKEN: Final[str | None] = environ.get("GITHUB_TOKEN", environ.get("TOKEN", None))
     API_VERSION: Final[str] = "2022-11-28"
     API_ENDPOINT: Final[str] = "https://api.github.com"
 
     assert TOKEN is not None, "GITHUB_TOKEN must be set in environment variables."
 except (AssertionError, AttributeError, OSError) as err:
     LOGGER.error(f"Error during global configuration:::{err}")
-    raise ValueError(err) from err
 
 
 def write_json(fp: Path, data: dict[str, Any] | None) -> bool:
