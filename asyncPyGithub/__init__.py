@@ -10,13 +10,7 @@ from ._types import (
     MinimalRepository,
 )
 
-from .base import (
-    req,
-    write_json,
-    read_json,
-    CACHE_DIR,
-    API_ENDPOINT
-)
+from .base import req, write_json, read_json, CACHE_DIR, API_ENDPOINT
 
 
 from .User import GitHubUserPortal, UserQueryReturnable
