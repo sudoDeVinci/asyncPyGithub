@@ -19,6 +19,8 @@ if __name__ == "__main__":
             print(f">> Error: {user.message} (Code: {user.code})")
             return
 
+        write_json(CACHE_DIR / "authenticate.json", user.model_dump(mode="json"))
+
         changes = {
             "description": "Swedish developer - Network Security and Hardware Programming | Developer @ CherryTe.ch and HereYouGoPup.com",
         }
@@ -41,32 +43,28 @@ if __name__ == "__main__":
         results = await asyncio.gather(*awaitables)
 
         write_json(
-            CACHE_DIR / "user_update.json",
-            results[0][1].model_dump(mode="json")
+            CACHE_DIR / "user_update.json", results[0][1].model_dump(mode="json")
         )
+        write_json(CACHE_DIR / "user_by_id.json", results[1][1].model_dump(mode="json"))
         write_json(
-            CACHE_DIR / "user_by_id.json",
-            results[1][1].model_dump(mode="json")
-        )
-        write_json(
-            CACHE_DIR / "user_by_username.json",
-            results[2][1].model_dump(mode="json")
+            CACHE_DIR / "user_by_username.json", results[2][1].model_dump(mode="json")
         )
         write_json(
             CACHE_DIR / "all_users_page1_pp5.json",
-            [user.model_dump(mode="json") for user in results[3][1]]
-            if isinstance(results[3][1], list)
-            else results[3][1].model_dump(mode="json")
+            (
+                [user.model_dump(mode="json") for user in results[3][1]]
+                if isinstance(results[3][1], list)
+                else results[3][1].model_dump(mode="json")
+            ),
         )
-        write_json(
-            CACHE_DIR / "hovercard.json",
-            results[4][1].model_dump(mode="json")
-        )
+        write_json(CACHE_DIR / "hovercard.json", results[4][1].model_dump(mode="json"))
         write_json(
             CACHE_DIR / "repos.json",
-            [repo.model_dump(mode="json") for repo in results[5][1]]
-            if isinstance(results[5][1], list)
-            else results[5][1].model_dump(mode="json")
+            (
+                [repo.model_dump(mode="json") for repo in results[5][1]]
+                if isinstance(results[5][1], list)
+                else results[5][1].model_dump(mode="json")
+            ),
         )
 
         for result in results:
