@@ -1,0 +1,5 @@
+{
+    "code": 403,
+    "message": "Resource not accessible by personal access token",
+    "endpoint": "/users/sudoDeVinci/hovercard"
+}

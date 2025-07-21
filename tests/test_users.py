@@ -4,7 +4,7 @@ from responses import RequestsMock, GET, PATCH
 from pathlib import Path
 from pytest import mark
 
-JSONDIR = Path(__file__).parent.parent.resolve() / "asyncPyGithub" / "__github_cache__"
+JSONDIR = Path(__file__).parent.resolve() / "traffic"
 USER_ENDPOINT: Final[str] = f"{API_ENDPOINT}/user"
 USERS_ENDPOINT: Final[str] = f"{API_ENDPOINT}/users"
 
