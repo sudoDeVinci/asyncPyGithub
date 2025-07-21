@@ -2,9 +2,9 @@
 
 # asyncPyGithub
 
+[![Testing](https://github.com/sudoDeVinci/asyncPyGithub/actions/workflows/testing.yml/badge.svg?branch=main)](https://github.com/sudoDeVinci/asyncPyGithub/actions/workflows/testing.yml)
 [![Linting](https://github.com/sudoDeVinci/asyncPyGithub/actions/workflows/linting.yml/badge.svg?branch=main)](https://github.com/sudoDeVinci/asyncPyGithub/actions/workflows/linting.yml)
 [![MyPy](https://github.com/sudoDeVinci/asyncPyGithub/actions/workflows/mypy.yml/badge.svg?branch=main)](https://github.com/sudoDeVinci/asyncPyGithub/actions/workflows/mypy.yml)
-[![Testing](https://github.com/sudoDeVinci/asyncPyGithub/actions/workflows/testing.yml/badge.svg?branch=main)](https://github.com/sudoDeVinci/asyncPyGithub/actions/workflows/testing.yml)
 [![Python 3.12+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Validation: Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://pydantic.dev)
