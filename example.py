@@ -59,7 +59,7 @@ if __name__ == "__main__":
         )
         write_json(CACHE_DIR / "hovercard.json", results[4][1].model_dump(mode="json"))
         write_json(
-            CACHE_DIR / "repos.json",
+            CACHE_DIR / "org_repos.json",
             (
                 [repo.model_dump(mode="json") for repo in results[5][1]]
                 if isinstance(results[5][1], list)
