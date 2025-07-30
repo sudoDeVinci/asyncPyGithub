@@ -12,6 +12,12 @@ from .repos import (
     RepoVisibility,
     MinimalRepositoryJSON,
     MinimalRepository,
+    FullRepositoryJSON,
+    FullRepository,
+    Commit,
+    Tag,
+    TopicsJSON,
+    Topics,
 )
 
 from .users import (
@@ -24,6 +30,8 @@ from .users import (
     HoverCard,
     HoverCardContextJSON,
     HoverCardContext,
+    Contributor,
+    ContributorJSON,
 )
 
 __all__ = (
@@ -34,6 +42,8 @@ __all__ = (
     "PrivateUser",
     "SimpleUserJSON",
     "SimpleUser",
+    "FullRepositoryJSON",
+    "FullRepository",
     "HoverCardJSON",
     "HoverCard",
     "HoverCardContextJSON",
@@ -46,4 +56,10 @@ __all__ = (
     "MinimalRepository",
     "GitHubPortal",
     "needs_authentication",
+    "Contributor",
+    "ContributorJSON",
+    "Commit",
+    "Tag",
+    "TopicsJSON",
+    "Topics",
 )
