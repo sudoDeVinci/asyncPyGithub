@@ -171,9 +171,10 @@ class GitHubRepositoryPortal(GitHubPortal):
 
     @needs_authentication
     async def get_user_repo(
+        cls: Self,
         owner: str,
         repo: str,
-    ) -> tuple[int, list[FullRepository] | ErrorMessage]:
+    ) -> tuple[int, FullRepository | ErrorMessage]:
         """
         Lists repositories for the authenticated user.
         This endpoint can be used without authentication, or
@@ -210,6 +211,7 @@ class GitHubRepositoryPortal(GitHubPortal):
 
     @needs_authentication
     async def update_repository(
+        cls: Self,
         owner: str,
         repo: str,
         name: Optional[str] = None,
@@ -302,7 +304,7 @@ class GitHubRepositoryPortal(GitHubPortal):
 
     @needs_authentication
     async def delete_repository(
-        owner: str, repo: str
+        cls: Self, owner: str, repo: str
     ) -> tuple[int, Optional[ErrorMessage]]:
         """
         Deletes a repository.
@@ -338,7 +340,12 @@ class GitHubRepositoryPortal(GitHubPortal):
 
     @needs_authentication
     async def list_contributors(
-        owner: str, repo: str, anon: bool = False, per_page: int = 30, page: int = 1
+        cls: Self,
+        owner: str,
+        repo: str,
+        anon: bool = False,
+        per_page: int = 30,
+        page: int = 1,
     ) -> tuple[int, list[Contributor] | ErrorMessage]:
         """
         Lists contributors to the specified repository and sorts them by the number of commits per contributor in descending order. This endpoint may return information that is a few hours old because the GitHub REST API caches contributor data to improve performance.
@@ -379,7 +386,7 @@ class GitHubRepositoryPortal(GitHubPortal):
 
     @needs_authentication
     async def list_repository_languages(
-        owner: str, repo: str
+        cls: Self, owner: str, repo: str
     ) -> tuple[int, dict[str, int] | ErrorMessage]:
         """
         Lists languages for the specified repository. The value shown for each language is the number of bytes of code written in that language.
@@ -414,7 +421,7 @@ class GitHubRepositoryPortal(GitHubPortal):
 
     @needs_authentication
     async def list_repository_tags(
-        owner: str, repo: str, per_page: int = 30, page: int = 1
+        cls: Self, owner: str, repo: str, per_page: int = 30, page: int = 1
     ) -> tuple[int, list[Tag] | ErrorMessage]:
         """
         Lists tags for the specified repository.
@@ -455,7 +462,7 @@ class GitHubRepositoryPortal(GitHubPortal):
 
     @needs_authentication
     async def get_repository_topics(
-        owner: str, repo: str
+        cls: Self, owner: str, repo: str
     ) -> tuple[int, Topics | ErrorMessage]:
         """
         Lists topics for the specified repository.

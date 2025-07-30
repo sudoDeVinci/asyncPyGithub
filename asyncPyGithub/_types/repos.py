@@ -251,7 +251,6 @@ class FullRepositoryJSON(TypedDict, total=False):
     trees_url: HttpUrl
     clone_url: HttpUrl
     mirror_url: Optional[HttpUrl]
-    hooks_url: HttpUrl
     svn_url: HttpUrl
     homepage: Optional[str]
     language: Optional[str]
@@ -478,25 +477,16 @@ class FullRepository(BaseModel):
     notifications_url: HttpUrl
     pulls_url: HttpUrl
     releases_url: HttpUrl
-    ssh_url: HttpUrl = None  # Optional, but typically present in full repositories.
-    stargazers_url: HttpUrl = (
-        None  # Optional, but typically present in full repositories.
-    )
-    statuses_url: HttpUrl = (
-        None  # Optional, but typically present in full repositories.
-    )
-    subscribers_url: HttpUrl = (
-        None  # Optional, but typically present in full repositories.
-    )
-    subscription_url: HttpUrl = (
-        None  # Optional, but typically present in full repositories.
-    )
-    tags_url: HttpUrl = None  # Optional, but typically present in full repositories.
-    teams_url: HttpUrl = None  # Optional, but typically present in full repositories.
+    ssh_url: Optional[HttpUrl] = None
+    stargazers_url: Optional[HttpUrl] = None
+    subscribers_url: Optional[HttpUrl] = None
+    subscription_url: Optional[HttpUrl] = None
+    tags_url: Optional[HttpUrl] = None
+    teams_url: Optional[HttpUrl] = None
     trees_url: str
-    clone_url: HttpUrl = None  # Optional, but typically present in full repositories.
+    clone_url: Optional[HttpUrl] = None
     mirror_url: Optional[HttpUrl] = None
-    svn_url: HttpUrl = None  # Optional, but typically present in full repositories.
+    svn_url: Optional[HttpUrl] = None
     homepage: Optional[str] = None
     language: Optional[str] = None
     forks_count: int = 0
