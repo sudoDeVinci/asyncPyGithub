@@ -51,9 +51,11 @@ Usually defaults to 'all'.
 class NullDict(TypedDict):
     type: Literal["null"]
 
+
 class CommitJSON(TypedDict):
     sha: str
     url: HttpUrl
+
 
 class TagJSON(TypedDict):
     name: str
@@ -62,8 +64,10 @@ class TagJSON(TypedDict):
     tarball_url: HttpUrl
     node_id: str
 
+
 class TopicsJSON(TypedDict):
     names: List[str]
+
 
 class PermissionsJSON(TypedDict):
     admin: bool
@@ -195,7 +199,6 @@ class MinimalRepositoryJSON(TypedDict):
     web_commit_signoff_required: NotRequired[bool]
     security_and_analysis: NotRequired[Optional[SecurityAndAnalysisJSON]]
     custom_properties: NotRequired[Dict[str, Any]]
-
 
 
 class FullRepositoryJSON(TypedDict, total=False):
@@ -476,17 +479,25 @@ class FullRepository(BaseModel):
     pulls_url: HttpUrl
     releases_url: HttpUrl
     ssh_url: HttpUrl = None  # Optional, but typically present in full repositories.
-    stargazers_url: HttpUrl = None  # Optional, but typically present in full repositories.
-    statuses_url: HttpUrl = None  # Optional, but typically present in full repositories.
-    subscribers_url: HttpUrl = None  # Optional, but typically present in full repositories.
-    subscription_url: HttpUrl = None  # Optional, but typically present in full repositories.
+    stargazers_url: HttpUrl = (
+        None  # Optional, but typically present in full repositories.
+    )
+    statuses_url: HttpUrl = (
+        None  # Optional, but typically present in full repositories.
+    )
+    subscribers_url: HttpUrl = (
+        None  # Optional, but typically present in full repositories.
+    )
+    subscription_url: HttpUrl = (
+        None  # Optional, but typically present in full repositories.
+    )
     tags_url: HttpUrl = None  # Optional, but typically present in full repositories.
     teams_url: HttpUrl = None  # Optional, but typically present in full repositories.
     trees_url: str
     clone_url: HttpUrl = None  # Optional, but typically present in full repositories.
     mirror_url: Optional[HttpUrl] = None
     svn_url: HttpUrl = None  # Optional, but typically present in full repositories.
-    homepage: Optional[str] = None  
+    homepage: Optional[str] = None
     language: Optional[str] = None
     forks_count: int = 0
     stargazers_count: int = 0
@@ -498,7 +509,7 @@ class FullRepository(BaseModel):
     topics: List[str] = []
     has_issues: bool = True
     has_projects: bool = True
-    has_wiki: bool = True       
+    has_wiki: bool = True
     has_pages: bool = False
     has_downloads: bool = True
     has_discussions: bool = False
@@ -518,7 +529,9 @@ class FullRepository(BaseModel):
     allow_merge_commit: bool = True
     use_squash_pr_title_as_default: bool = False
     squash_merge_commit_title: Literal["PR_TITLE", "COMMIT_OR_PR_TITLE"] = "PR_TITLE"
-    squash_merge_commit_message: Literal["PR_BODY", "COMMIT_MESSAGES", "BLANK"] = "PR_BODY"
+    squash_merge_commit_message: Literal["PR_BODY", "COMMIT_MESSAGES", "BLANK"] = (
+        "PR_BODY"
+    )
     merge_commit_title: Literal["PR_TITLE", "MERGE_MESSAGE"] = "PR_TITLE"
     merge_commit_message: Literal["PR_BODY", "PR_TITLE", "BLANK"] = "PR_TITLE"
     allow_forking: bool = True
@@ -543,12 +556,14 @@ class Commit(BaseModel):
     sha: str
     url: HttpUrl
 
+
 class Tag(BaseModel):
     name: str
     commit: Commit
     zipball_url: HttpUrl
     tarball_url: HttpUrl
     node_id: str
+
 
 class Topics(BaseModel):
     names: List[str]
