@@ -94,6 +94,14 @@ class GitHubUserPortal(GitHubPortal):
     async def get_by_id(
         cls: "GitHubUserPortal", uid: int
     ) -> tuple[int, PrivateUser | ErrorMessage]:
+        """
+        Get a user by their ID.
+        This function uses the `/users/{user_id}` endpoint to get the user's information.
+        Args:
+            uid (int): The ID of the user to retrieve.
+        Returns:
+            tuple[int, PrivateUser | ErrorMessage]: A tuple containing the status code and either the
+        """
         endpoint = f"{USER_ENDPOINT}/{uid}"
         try:
             res = await req(fn=get, url=endpoint)

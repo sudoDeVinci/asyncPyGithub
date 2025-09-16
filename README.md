@@ -4,49 +4,49 @@
 
 [![Testing](https://github.com/sudoDeVinci/asyncPyGithub/actions/workflows/testing.yml/badge.svg?branch=main)](https://github.com/sudoDeVinci/asyncPyGithub/actions/workflows/testing.yml)
 [![Linting](https://github.com/sudoDeVinci/asyncPyGithub/actions/workflows/linting.yml/badge.svg?branch=main)](https://github.com/sudoDeVinci/asyncPyGithub/actions/workflows/linting.yml)
-[![MyPy](https://github.com/sudoDeVinci/asyncPyGithub/actions/workflows/mypy.yml/badge.svg?branch=main)](https://github.com/sudoDeVinci/asyncPyGithub/actions/workflows/mypy.yml)
+[![Type-Check](https://github.com/sudoDeVinci/asyncPyGithub/actions/workflows/mypy.yml/badge.svg?branch=main)](https://github.com/sudoDeVinci/asyncPyGithub/actions/workflows/mypy.yml)
 [![Python 3.12+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Validation: Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://pydantic.dev)
 
-**A modern, fully asynchronous Python library for the GitHub API with comprehensive type safety and async/await patterns.**
+**A fully asynchronous Python library for the GitHub API with comprehensive type safety.**
 
 </div>
 
 ---
 
-## ✨ **Key Features**
+## **Key Features**
 
 <table>
   <tr>
-    <td align="center">🏎️</td>
-    <td><strong>Fully Asynchronous</strong><br/>Built from the ground up with asyncio for maximum performance</td>
+    <td><strong>Fully Asynchronous</strong></td>
+    <td>Built from the ground up with asyncio for maximum performance</td>
   </tr>
+
   <tr>
-    <td align="center">🔒</td>
-    <td><strong>Type-Safe</strong><br/>Complete Pydantic v2 models with runtime validation and IDE support</td>
+    <td><strong>Comprehensive Typing</strong></td>
+    <td>Comprehensive type definitions to get the most out of your LSP.</td>
   </tr>
+
   <tr>
-    <td align="center">⚡</td>
-    <td><strong>Concurrent Operations</strong><br/>Execute multiple API calls simultaneously with asyncio.gather()</td>
+    <td><strong>Type-Safety</strong></td>
+    <td>Pydantic v2 models with runtime validation.</td>
   </tr>
+
   <tr>
-    <td align="center">🛠️</td>
-    <td><strong>Developer Experience</strong><br/>Intuitive Portal pattern with comprehensive error handling</td>
+    <td><strong>Developer-First Experience</strong></td>
+    <td>Intuitive 'Portal' pattern with comprehensive error handling.</td>
   </tr>
+
   <tr>
-    <td align="center">�</td>
-    <td><strong>Smart Caching</strong><br/>Built-in JSON caching system for optimized API usage</td>
-  </tr>
-  <tr>
-    <td align="center">🎯</td>
-    <td><strong>Modern Python</strong><br/>Leverages Python 3.11+ features with full typing support</td>
+    <td><strong>Smart Caching</strong></td>
+    <td>Built-in JSON caching system for optimized API usage</td>
   </tr>
 </table>
 
 ---
 
-## 🚀 **Quick Start**
+## **Quick Start**
 
 ### Installation
 
@@ -56,7 +56,7 @@ git clone https://github.com/sudoDeVinci/asyncPyGithub.git
 cd asyncPyGithub
 
 # Install dependencies
-pip install -r reqs.txt
+pip install -r requirements.txt
 ```
 
 ### Environment Setup
@@ -78,9 +78,9 @@ async def main():
     status, user = await GitHubUserPortal.authenticate()
     
     if status == 200:
-        print(f"👋 Hello, {user.login}! You have {user.public_repos} public repos.")
+        print(f"Hello, {user.login}! You have {user.public_repos} public repos.")
     else:
-        print(f"❌ Authentication failed: {user.message}")
+        print(f"Authentication failed: {user.message}")
 
 if __name__ == "__main__":
     asyncio.run(main())
@@ -88,21 +88,24 @@ if __name__ == "__main__":
 
 ---
 
-## 🔥 **Advanced Usage**
+## **Advanced Usage**
 
 ### Concurrent API Calls
 
-Maximize performance by executing multiple API calls simultaneously:
+Real-world use would require executing multiple API calls simultaneously:
 
 ```python
 import asyncio
 from typing import Any
 from types import CoroutineType
-from asyncPyGithub import GitHubUserPortal, GitHubRepositoryPortal, UserQueryReturnable
+from asyncPyGithub import (
+GitHubUserPortal,
+GitHubRepositoryPortal,
+UserQueryReturnable
+)
 
-async def fetch_user_data_concurrently():
-    """Demonstrate concurrent API calls for maximum efficiency."""
-    
+async def fetch_user_data_concurrently() -> None:
+
     # Authenticate first
     status, user = await GitHubUserPortal.authenticate()
     if status != 200:
@@ -114,86 +117,35 @@ async def fetch_user_data_concurrently():
         GitHubUserPortal.get_by_username(user.login),
         GitHubUserPortal.all(since=0, per_page=10),
         GitHubUserPortal.get_hovercard(user.login),
+        GitHubRepositoryPortal.get_organization_repos(
+            organization="LEGO",
+            type="all",
+            sort="full_name",
+            direction="asc",
+            per_page=5,
+            page=1,
+        )
     ]
     
     # Execute all operations concurrently
     results = await asyncio.gather(*operations)
     
-    # Process results
+    # Check results
     for i, (status_code, data) in enumerate(results):
         print(f"Operation {i+1}: Status {status_code}")
         if status_code == 200:
-            print(f"  ✅ Success: {type(data).__name__}")
+            print(f"Success: {type(data).__name__}")
         else:
-            print(f"  ❌ Error: {data.message}")
+            print(f"Error: {data.message}")
 
-asyncio.run(fetch_user_data_concurrently())
-```
+if __name__ == "__main__":
+    asyncio.run(fetch_user_data_concurrently())
 
-### Repository Operations
-
-```python
-async def explore_organization_repos():
-    """Fetch and analyze organization repositories."""
-    
-    status, repos = await GitHubRepositoryPortal.get_organization_repos(
-        organization="microsoft",
-        type="public",
-        sort="updated",
-        direction="desc",
-        per_page=20
-    )
-    
-    if status == 200:
-        print(f"📦 Found {len(repos)} repositories:")
-        for repo in repos[:5]:  # Show top 5
-            print(f"  • {repo.full_name} ⭐ {repo.stargazers_count}")
-    else:
-        print(f"❌ Failed to fetch repos: {repos.message}")
-
-asyncio.run(explore_organization_repos())
-```
-
-### Error Handling & Data Processing
-
-```python
-async def robust_user_operations():
-    """Demonstrate proper error handling and data serialization."""
-    from asyncPyGithub import write_json, CACHE_DIR
-    
-    try:
-        # Authenticate
-        status, user = await GitHubUserPortal.authenticate()
-        if status != 200:
-            raise Exception(f"Authentication failed: {user.message}")
-        
-        # Update user profile
-        updates = {
-            "bio": "🚀 Async Python Developer | GitHub API Enthusiast",
-            "location": "Cloud ☁️"
-        }
-        
-        status, updated_user = await GitHubUserPortal.update(updates)
-        
-        if status == 200:
-            # Cache the result
-            write_json(
-                CACHE_DIR / "updated_user.json", 
-                updated_user.model_dump(mode="json")
-            )
-            print("✅ Profile updated and cached successfully!")
-        else:
-            print(f"❌ Update failed: {updated_user.message}")
-            
-    except Exception as e:
-        print(f"💥 Unexpected error: {e}")
-
-asyncio.run(robust_user_operations())
 ```
 
 ---
 
-## 📚 **API Reference**
+## **API Reference**
 
 ### GitHubUserPortal
 
@@ -210,7 +162,8 @@ asyncio.run(robust_user_operations())
 
 | Method | Description | Parameters | Returns |
 |--------|-------------|------------|---------|
-| `get_organization_repos()` | List organization repositories | See parameters below | `tuple[int, list[MinimalRepository] \| ErrorMessage]` |
+| `get_organization_repos(organization, type, sort, direction, per_page, page)` | List organization repositories | `str, RepositoryType, RepoSortCriterion, RepoSortDirection` | `tuple[int, list[MinimalRepository] \| ErrorMessage]` |
+| ``
 
 ---
 
