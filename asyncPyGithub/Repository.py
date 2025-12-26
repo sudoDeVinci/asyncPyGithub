@@ -1,19 +1,19 @@
-from requests import get, post, patch, delete
-from typing_extensions import Self
 from typing import Literal, Optional
-from asyncPyGithub.base import req
+
+from typing_extensions import Self
+
 from ._types import (
+    Contributor,
     ErrorMessage,
-    RepositoryType,
-    RepoSortDirection,
-    RepoSortCriterion,
-    MinimalRepository,
     FullRepository,
     GitHubPortal,
-    needs_authentication,
-    Contributor,
+    MinimalRepository,
+    RepositoryType,
+    RepoSortCriterion,
+    RepoSortDirection,
     Tag,
     Topics,
+    needs_authentication,
 )
 
 
@@ -47,9 +47,9 @@ class GitHubRepositoryPortal(GitHubPortal):
         }
 
         try:
-            res = await req(
-                fn=get,
-                url=f"/orgs/{organization}/repos",
+            res = await cls.req(
+                "GET",
+                f"/orgs/{organization}/repos",
                 params=params,
                 headers={"accept": "application/vnd.github+json"},
             )
@@ -109,7 +109,6 @@ class GitHubRepositoryPortal(GitHubPortal):
         merge_commit_message: Literal["PR_BODY", "PR_TITLE", "BLANK"] = "PR_TITLE",
         custom_properties: dict[str, str | bool | int] | None = None,
     ) -> tuple[int, FullRepository | ErrorMessage]:
-
         params = {
             "name": name,
             "description": description,
@@ -141,9 +140,9 @@ class GitHubRepositoryPortal(GitHubPortal):
             params.update(custom_properties)
 
         try:
-            res = await req(
-                fn=post,
-                url=f"/orgs/{organization}/repos",
+            res = await cls.req(
+                "POST",
+                f"/orgs/{organization}/repos",
                 params=params,
                 headers={"accept": "application/vnd.github+json"},
             )
@@ -181,9 +180,9 @@ class GitHubRepositoryPortal(GitHubPortal):
         with read access to public repositories.
         """
         try:
-            res = await req(
-                fn=get,
-                url=f"repos/{owner}/{repo}",
+            res = await cls.req(
+                "GET",
+                f"repos/{owner}/{repo}",
                 headers={"accept": "application/vnd.github+json"},
             )
 
@@ -274,9 +273,9 @@ class GitHubRepositoryPortal(GitHubPortal):
         }
 
         try:
-            res = await req(
-                fn=patch,
-                url=f"repos/{owner}/{repo}",
+            res = await cls.req(
+                "PATCH",
+                f"repos/{owner}/{repo}",
                 params={k: v for k, v in params.items() if v is not None},
                 headers={"accept": "application/vnd.github+json"},
             )
@@ -311,9 +310,9 @@ class GitHubRepositoryPortal(GitHubPortal):
         This endpoint can be used with write access to the repository.
         """
         try:
-            res = await req(
-                fn=delete,
-                url=f"repos/{owner}/{repo}",
+            res = await cls.req(
+                "DELETE",
+                f"repos/{owner}/{repo}",
                 headers={"accept": "application/vnd.github+json"},
             )
 
@@ -354,9 +353,9 @@ class GitHubRepositoryPortal(GitHubPortal):
         params = {"anon": anon, "per_page": per_page, "page": page}
 
         try:
-            res = await req(
-                fn=get,
-                url=f"repos/{owner}/{repo}/contributors",
+            res = await cls.req(
+                "GET",
+                f"repos/{owner}/{repo}/contributors",
                 params=params,
                 headers={"accept": "application/vnd.github+json"},
             )
@@ -393,9 +392,9 @@ class GitHubRepositoryPortal(GitHubPortal):
         """
 
         try:
-            res = await req(
-                fn=get,
-                url=f"repos/{owner}/{repo}/languages",
+            res = await cls.req(
+                "GET",
+                f"repos/{owner}/{repo}/languages",
                 headers={"accept": "application/vnd.github+json"},
             )
 
@@ -432,9 +431,9 @@ class GitHubRepositoryPortal(GitHubPortal):
         params = {"per_page": per_page, "page": page}
 
         try:
-            res = await req(
-                fn=get,
-                url=f"repos/{owner}/{repo}/tags",
+            res = await cls.req(
+                "GET",
+                f"repos/{owner}/{repo}/tags",
                 params=params,
                 headers={"accept": "application/vnd.github+json"},
             )
@@ -471,9 +470,9 @@ class GitHubRepositoryPortal(GitHubPortal):
         """
 
         try:
-            res = await req(
-                fn=get,
-                url=f"repos/{owner}/{repo}/topics",
+            res = await cls.req(
+                "GET",
+                f"repos/{owner}/{repo}/topics",
                 headers={"accept": "application/vnd.github+json"},
             )
 

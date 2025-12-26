@@ -1,23 +1,21 @@
 from ._types import (
-    UserPlanJSON,
     ErrorMessage,
+    GitHubPortal,
     JSONDict,
-    PrivateUserJSON,
-    SimpleUserJSON,
-    SimpleUser,
-    PrivateUser,
-    MinimalRepositoryJSON,
     MinimalRepository,
+    MinimalRepositoryJSON,
+    PrivateUser,
+    PrivateUserJSON,
+    SimpleUser,
+    SimpleUserJSON,
+    UserPlanJSON,
 )
-
-from .base import req, write_json, read_json, CACHE_DIR, API_ENDPOINT
-
-
+from .base import CACHE_DIR, read_json, write_json
+from .Repository import GitHubRepositoryPortal
 from .User import GitHubUserPortal, UserQueryReturnable
 
-from .Repository import GitHubRepositoryPortal
-
 __all__ = (
+    "GitHubPortal",
     "UserQueryReturnable",
     "ErrorMessage",
     "SimpleUserJSON",
@@ -26,11 +24,9 @@ __all__ = (
     "PrivateUserJSON",
     "PrivateUser",
     "JSONDict",
-    "req",
     "write_json",
     "read_json",
     "CACHE_DIR",
-    "API_ENDPOINT",
     "MinimalRepositoryJSON",
     "MinimalRepository",
     "GitHubUserPortal",

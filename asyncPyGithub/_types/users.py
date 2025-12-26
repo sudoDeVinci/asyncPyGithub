@@ -1,5 +1,5 @@
-from typing_extensions import TypedDict, Optional
 from pydantic import BaseModel, EmailStr, HttpUrl, PastDatetime
+from typing_extensions import Optional, TypedDict
 
 
 class ContributorJSON(TypedDict):
@@ -249,7 +249,7 @@ class HoverCardJSON(TypedDict):
     contexts: list[HoverCardContextJSON]
 
 
-class HoverCard(TypedDict):
+class HoverCard(BaseModel):
     """
     A GitHub Hovercard.
     """

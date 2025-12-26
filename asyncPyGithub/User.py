@@ -1,21 +1,17 @@
-from ._types import (
-    ErrorMessage,
-    PrivateUser,
-    SimpleUserJSON,
-    SimpleUser,
-    HoverCard,
-    HoverCardJSON,
-    HoverCardContext,
-    HoverCardContextJSON,
-    GitHubPortal,
-    needs_authentication,
-)
-
-from .base import req
-
-from requests import get, patch
 from typing import Final, Literal
 
+from ._types import (
+    ErrorMessage,
+    GitHubPortal,
+    HoverCard,
+    HoverCardContext,
+    HoverCardContextJSON,
+    HoverCardJSON,
+    PrivateUser,
+    SimpleUser,
+    SimpleUserJSON,
+    needs_authentication,
+)
 
 UserQueryReturnable = tuple[
     int, PrivateUser | SimpleUser | list[SimpleUser] | ErrorMessage
@@ -26,35 +22,6 @@ USERS_ENDPOINT: Final[Literal["/users"]] = "/users"
 
 
 class GitHubUserPortal(GitHubPortal):
-
-    @classmethod
-    async def authenticate(
-        cls: type["GitHubUserPortal"],
-    ) -> tuple[int, PrivateUser | ErrorMessage]:
-        """
-        Authenticate the user and return their information.
-        Or return an error message if authentication fails.
-        This function uses the `/user` endpoint to get the authenticated user's information.
-        Available: [https://docs.github.com/en/rest/users/users?apiVersion=2022-11-28](https://docs.github.com/en/rest/users/users?apiVersion=2022-11-28)
-        """
-        try:
-            res = await req(fn=get, url="/user")
-            if res.status_code != 200:
-                return (
-                    res.status_code,
-                    ErrorMessage(
-                        code=res.status_code,
-                        message=res.json().get("message", "Unknown error"),
-                        endpoint=USER_ENDPOINT,
-                    ),
-                )
-
-        except Exception as e:
-            return (500, ErrorMessage(code=500, message=str(e), endpoint="/user"))
-
-        cls.__bases__[0]._authenticated = True  # type: ignore[attr-defined]
-        return (res.status_code, PrivateUser(**res.json()))
-
     @needs_authentication
     async def update(
         cls: "GitHubUserPortal", changes: SimpleUserJSON
@@ -66,7 +33,7 @@ class GitHubUserPortal(GitHubPortal):
         """
         endpoint = USER_ENDPOINT
         try:
-            res = await req(fn=patch, url=endpoint, json=changes)
+            res = await cls.req("PATCH", endpoint, json=changes)
             if res.status_code != 200:
                 return (
                     res.status_code,
@@ -104,7 +71,7 @@ class GitHubUserPortal(GitHubPortal):
         """
         endpoint = f"{USER_ENDPOINT}/{uid}"
         try:
-            res = await req(fn=get, url=endpoint)
+            res = await cls.req("GET", endpoint)
             if res.status_code != 200:
                 return (
                     res.status_code,
@@ -129,7 +96,7 @@ class GitHubUserPortal(GitHubPortal):
     ) -> tuple[int, PrivateUser | ErrorMessage]:
         endpoint = f"{USERS_ENDPOINT}/{username}"
         try:
-            res = await req(fn=get, url=endpoint)
+            res = await cls.req("GET", endpoint)
             if res.status_code != 200:
                 return (
                     res.status_code,
@@ -152,9 +119,9 @@ class GitHubUserPortal(GitHubPortal):
         cls: "GitHubUserPortal", since: int = 0, per_page: int = 30
     ) -> tuple[int, list[SimpleUser] | ErrorMessage]:
         try:
-            res = await req(
-                fn=get,
-                url=USERS_ENDPOINT,
+            res = await cls.req(
+                "GET",
+                USERS_ENDPOINT,
                 params={"since": since, "per_page": per_page},
             )
             if res.status_code != 200:
@@ -186,7 +153,7 @@ class GitHubUserPortal(GitHubPortal):
         """
         endpoint = f"{USERS_ENDPOINT}/{username}/hovercard"
         try:
-            res = await req(fn=get, url=endpoint)
+            res = await cls.req("GET", endpoint)
             if res.status_code != 200:
                 return (
                     res.status_code,
