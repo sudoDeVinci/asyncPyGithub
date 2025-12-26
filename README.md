@@ -9,252 +9,178 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Validation: Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://pydantic.dev)
 
-**A fully asynchronous Python library for the GitHub API with comprehensive type safety.**
+**A fully asynchronous Python library for the GitHub API.**
 
 </div>
 
----
-
-## **Key Features**
-
-<table>
-  <tr>
-    <td><strong>Fully Asynchronous</strong></td>
-    <td>Built from the ground up with asyncio for maximum performance</td>
-  </tr>
-
-  <tr>
-    <td><strong>Comprehensive Typing</strong></td>
-    <td>Comprehensive type definitions to get the most out of your LSP.</td>
-  </tr>
-
-  <tr>
-    <td><strong>Type-Safety</strong></td>
-    <td>Pydantic v2 models with runtime validation.</td>
-  </tr>
-
-  <tr>
-    <td><strong>Developer-First Experience</strong></td>
-    <td>Intuitive 'Portal' pattern with comprehensive error handling.</td>
-  </tr>
-
-  <tr>
-    <td><strong>Smart Caching</strong></td>
-    <td>Built-in JSON caching system for optimized API usage</td>
-  </tr>
-</table>
-
----
-
-## **Quick Start**
-
-### Installation
+## Install
 
 ```bash
-# Clone the repository
 git clone https://github.com/sudoDeVinci/asyncPyGithub.git
 cd asyncPyGithub
-
-# Install dependencies
 pip install -r requirements.txt
 ```
 
-### Environment Setup
+## Setup
 
-Create a `.env` file in your project root:
+Create a `.env` file:
 
-```bash
-GITHUB_TOKEN=your_personal_access_token_here
+```
+GITHUB_TOKEN=your_token_here
 ```
 
-### Basic Usage
+## Client Lifecycle
+
+The library uses a shared `httpx.AsyncClient` under the hood. You have two options for managing it:
+
+### Option 1: Let it auto-start (simple)
+
+The client starts automatically on first request. Just remember to close it when done:
 
 ```python
 import asyncio
-from asyncPyGithub import GitHubUserPortal
+from asyncPyGithub import GitHubPortal, GitHubUserPortal
 
 async def main():
-    # Authenticate with GitHub
-    status, user = await GitHubUserPortal.authenticate()
+    # Client starts automatically on first request
+    status, user = await GitHubPortal.authenticate("your_token")
+    if status != 200:
+        print(f"Auth failed: {user.message}")
+        return
     
+    print(f"Logged in as {user.login}")
+    
+    # Do stuff...
+    status, other = await GitHubUserPortal.get_by_username("torvalds")
     if status == 200:
-        print(f"Hello, {user.login}! You have {user.public_repos} public repos.")
-    else:
-        print(f"Authentication failed: {user.message}")
+        print(f"Found: {other.login}")
+    
+    # Clean up when done
+    await GitHubPortal.close()
 
-if __name__ == "__main__":
-    asyncio.run(main())
+asyncio.run(main())
 ```
 
----
+### Option 2: Use the context manager (scoped)
 
-## **Advanced Usage**
-
-### Concurrent API Calls
-
-Real-world use would require executing multiple API calls simultaneously:
+For scoped usage where you want automatic cleanup:
 
 ```python
 import asyncio
-from typing import Any
-from types import CoroutineType
-from asyncPyGithub import (
-GitHubUserPortal,
-GitHubRepositoryPortal,
-UserQueryReturnable
-)
+from asyncPyGithub import GitHubPortal, GitHubUserPortal
 
-async def fetch_user_data_concurrently() -> None:
+async def main():
+    async with GitHubPortal.scoped_client():
+        status, user = await GitHubPortal.authenticate("your_token")
+        if status != 200:
+            return
+        
+        status, other = await GitHubUserPortal.get_by_username("torvalds")
+        # Client closes automatically when exiting the context
 
-    # Authenticate first
-    status, user = await GitHubUserPortal.authenticate()
+asyncio.run(main())
+```
+
+## Concurrent Requests
+
+The client uses connection pooling, so concurrent requests share connections efficiently:
+
+```python
+import asyncio
+from asyncPyGithub import GitHubPortal, GitHubUserPortal, GitHubRepositoryPortal
+
+async def main():
+    status, user = await GitHubPortal.authenticate("your_token")
     if status != 200:
         return
     
-    # Define multiple operations to run concurrently
-    operations: list[CoroutineType[Any, Any, UserQueryReturnable]] = [
+    # All requests run concurrently over the shared client
+    results = await asyncio.gather(
         GitHubUserPortal.get_by_id(user.id),
         GitHubUserPortal.get_by_username(user.login),
-        GitHubUserPortal.all(since=0, per_page=10),
-        GitHubUserPortal.get_hovercard(user.login),
-        GitHubRepositoryPortal.get_organization_repos(
-            organization="LEGO",
-            type="all",
-            sort="full_name",
-            direction="asc",
-            per_page=5,
-            page=1,
-        )
-    ]
+        GitHubUserPortal.all(since=0, per_page=5),
+        GitHubRepositoryPortal.get_organization_repos("LEGO", per_page=5),
+    )
     
-    # Execute all operations concurrently
-    results = await asyncio.gather(*operations)
-    
-    # Check results
-    for i, (status_code, data) in enumerate(results):
-        print(f"Operation {i+1}: Status {status_code}")
-        if status_code == 200:
-            print(f"Success: {type(data).__name__}")
+    for status, data in results:
+        if status == 200:
+            print(f"OK: {type(data).__name__}")
         else:
             print(f"Error: {data.message}")
+    
+    await GitHubPortal.close()
 
-if __name__ == "__main__":
-    asyncio.run(fetch_user_data_concurrently())
-
+asyncio.run(main())
 ```
 
----
+## API
 
-## **API Reference**
+Every method returns `tuple[int, Result | ErrorMessage]`. Check the status code first.
+
+### GitHubPortal
+
+| Method | What it does |
+|--------|--------------|
+| `authenticate(token)` | Auth and get your user info. Starts client if needed. |
+| `start()` | Manually start the HTTP client |
+| `close()` | Close the HTTP client |
+| `scoped_client()` | Context manager that auto-closes on exit |
 
 ### GitHubUserPortal
 
-| Method | Description | Parameters | Returns |
-|--------|-------------|------------|---------|
-| `authenticate()` | Authenticate user and get profile | None | `tuple[int, PrivateUser \| ErrorMessage]` |
-| `update(changes)` | Update authenticated user's profile | `SimpleUserJSON` | `tuple[int, PrivateUser \| ErrorMessage]` |
-| `get_by_id(uid)` | Get user by ID | `int` | `tuple[int, PrivateUser \| ErrorMessage]` |
-| `get_by_username(username)` | Get user by username | `str` | `tuple[int, PrivateUser \| ErrorMessage]` |
-| `all(since, per_page)` | List all users | `int, int` | `tuple[int, list[SimpleUser] \| ErrorMessage]` |
-| `get_hovercard(username)` | Get user hovercard | `str` | `tuple[int, HoverCard \| ErrorMessage]` |
+| Method | What it does |
+|--------|--------------|
+| `update(changes)` | Update your profile |
+| `get_by_id(uid)` | Get user by ID |
+| `get_by_username(username)` | Get user by username |
+| `all(since, per_page)` | List users |
+| `get_hovercard(username)` | Get hovercard info |
 
 ### GitHubRepositoryPortal
 
-| Method | Description | Parameters | Returns |
-|--------|-------------|------------|---------|
-| `get_organization_repos(organization, type, sort, direction, per_page, page)` | List organization repositories | `str, RepositoryType, RepoSortCriterion, RepoSortDirection` | `tuple[int, list[MinimalRepository] \| ErrorMessage]` |
-| ``
+| Method | What it does |
+|--------|--------------|
+| `get_organization_repos(org, ...)` | List org repos |
+| `create_organization_repo(org, name, ...)` | Create repo in org |
+| `get_user_repo(owner, repo)` | Get a specific repo |
+| `update_repository(owner, repo, ...)` | Update repo settings |
+| `delete_repository(owner, repo)` | Delete a repo |
+| `list_contributors(owner, repo)` | List contributors |
+| `list_repository_languages(owner, repo)` | Get language breakdown |
+| `list_repository_tags(owner, repo)` | List tags |
+| `get_repository_topics(owner, repo)` | Get topics |
 
----
-
-## 🏗️ **Architecture**
-
-### Portal Pattern
-
-asyncPyGithub uses the idea of  **Portals** for clean, organized API access:
-
-```
-GitHubUserPortal ──────► User-related operations
-GitHubRepositoryPortal ──► Repository operations  
-GitHubPortal (Base) ────► Shared authentication & utilities
-```
-
-### Type System
-
-**Comprehensive type coverage** with Pydantic v2:
-
-- **Models**: `PrivateUser`, `SimpleUser`, `MinimalRepository`
-- **TypedDicts**: JSON-compatible interfaces for all GitHub responses
-- **Validation**: Runtime type checking and data validation
-- **IDE Support**: Full IntelliSense and error detection
-
-### Error Handling
-
-**Consistent error patterns**:
+## Error Handling
 
 ```python
-status_code, result = await GitHubUserPortal.some_operation()
+status, result = await GitHubUserPortal.get_by_username("doesnt-exist")
 
-if status_code == 200:
-    # Success: result is the expected data type
-    print(f"Success: {result.login}")
+if status == 200:
+    print(result.login)
 else:
-    # Error: result is an ErrorMessage object
+    # result is an ErrorMessage
     print(f"Error {result.code}: {result.message}")
 ```
 
----
+## Structure
 
-
-## 🤝 **Contributing**
-
-We welcome contributions! Here's how to get started:
-
-1. **Fork** the repository
-2. **Create** a feature branch: `git checkout -b feature/amazing-feature`
-3. **Commit** your changes: `git commit -m 'Add amazing feature'`
-4. **Push** to the branch: `git push origin feature/amazing-feature`
-5. **Open** a Pull Request
-
-### Development Setup
-
-```bash
-# Clone your fork
-git clone https://github.com/yourusername/asyncPyGithub.git
-cd asyncPyGithub
-
-# Install development dependencies
-pip install -r reqs.txt
-
-# Run type checking
-mypy .
-
-# Run linting
-ruff check .
-
-# Format code
-black .
+```
+GitHubPortal              # Base - auth, client management
+├── GitHubUserPortal      # /user and /users endpoints
+└── GitHubRepositoryPortal # /repos and /orgs/.../repos endpoints
 ```
 
----
+All responses are Pydantic models (`PrivateUser`, `SimpleUser`, `MinimalRepository`, etc.).
 
-## 📖 **Examples**
+## Testing
 
-Check out `example.py` for comprehensive usage examples including:
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
 
-- Authentication workflows
-- Concurrent API operations
-- Data caching and serialization
-- Error handling patterns
-- Real-world use cases
+## Limitations
 
----
-
-## 🐛 **Known Issues & Limitations**
-
-- **Rate Limiting**: No built-in rate limiting (implement your own delays)
-- **Pagination**: Manual pagination handling required for large datasets
-- **Webhooks**: No webhook handling capabilities (API-only)
-
----
-
+- No rate limit handling
+- No pagination helpers
+- No webhooks
