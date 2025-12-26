@@ -1,4 +1,5 @@
 annotated-types==0.7.0
+anyio==4.12.0
 black==25.1.0
 certifi==2025.6.15
 charset-normalizer==3.4.2
@@ -6,10 +7,17 @@ click==8.2.1
 coverage==7.9.2
 dnspython==2.7.0
 email_validator==2.2.0
+h11==0.16.0
+h2==4.3.0
+hpack==4.1.0
+httpcore==1.0.9
+httpx==0.28.1
+hyperframe==6.1.0
 idna==3.10
 iniconfig==2.1.0
 mypy==1.16.1
 mypy_extensions==1.1.0
+numpy==2.4.0
 packaging==25.0
 pathspec==0.12.1
 platformdirs==4.3.8
@@ -22,9 +30,7 @@ pytest-asyncio==1.1.0
 pytest-cov==6.2.1
 python-dotenv==1.1.1
 PyYAML==6.0.2
-requests==2.32.4
-responses==0.25.7
-ruff==0.12.2
+respx==0.22.0
 types-requests==2.32.4.20250611
 typing-inspection==0.4.1
 typing_extensions==4.14.1
