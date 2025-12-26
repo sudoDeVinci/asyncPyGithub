@@ -50,7 +50,7 @@ class GitHubRepositoryPortal(GitHubPortal):
             res = await cls.req(
                 "GET",
                 f"/orgs/{organization}/repos",
-                params=params,
+                params=params,  # type: ignore[arg-type]
                 headers={"accept": "application/vnd.github+json"},
             )
 
@@ -143,7 +143,7 @@ class GitHubRepositoryPortal(GitHubPortal):
             res = await cls.req(
                 "POST",
                 f"/orgs/{organization}/repos",
-                params=params,
+                params=params,  # type: ignore[arg-type]
                 headers={"accept": "application/vnd.github+json"},
             )
 
@@ -356,7 +356,7 @@ class GitHubRepositoryPortal(GitHubPortal):
             res = await cls.req(
                 "GET",
                 f"repos/{owner}/{repo}/contributors",
-                params=params,
+                params=params,  # type: ignore[arg-type]
                 headers={"accept": "application/vnd.github+json"},
             )
 
@@ -434,7 +434,7 @@ class GitHubRepositoryPortal(GitHubPortal):
             res = await cls.req(
                 "GET",
                 f"repos/{owner}/{repo}/tags",
-                params=params,
+                params=params,  # type: ignore[arg-type]
                 headers={"accept": "application/vnd.github+json"},
             )
 

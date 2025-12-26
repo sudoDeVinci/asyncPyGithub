@@ -3,7 +3,7 @@ from os import environ
 from types import CoroutineType
 from typing import Any, no_type_check
 
-from dotenv import load_dotenv  # type: ignore
+from dotenv import load_dotenv
 
 from asyncPyGithub import (
     CACHE_DIR,
@@ -36,7 +36,7 @@ async def main() -> None:
 
         write_json(CACHE_DIR / "authenticate.json", user.model_dump(mode="json"))
 
-    user = GitHubPortal._user  # type: ignore[attr-defined]
+    user = GitHubPortal._user
     changes = {
         "description": "Swedish developer - Network Security and Hardware Programming | Developer @ CherryTe.ch and HereYouGoPup.com",
     }

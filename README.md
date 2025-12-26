@@ -15,6 +15,12 @@
 
 ## Install
 
+### pip
+```bash
+pip install asyncPyGithub
+```
+
+### Manual
 ```bash
 git clone https://github.com/sudoDeVinci/asyncPyGithub.git
 cd asyncPyGithub

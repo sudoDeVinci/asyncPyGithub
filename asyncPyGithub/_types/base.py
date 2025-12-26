@@ -31,7 +31,7 @@ class ErrorMessage:
         self.message = message
         self.endpoint = endpoint
 
-    def model_dump(self, **kwargs) -> JSONDict:
+    def model_dump(self, **kwargs: JSONDict) -> JSONDict:
         """
         Converts the error message to a JSON-compatible dictionary.
 
@@ -97,7 +97,7 @@ class GitHubPortal:
         async with cls._connection_lock:
             if cls._client is None:
                 cls._client = AsyncClient(
-                    base_url=cast(str, cls._endpoint),
+                    base_url=cls._endpoint,
                     headers=cast(HeaderTypes, cls._headers),
                     timeout=30,
                     http2=False,  # Disable HTTP/2
@@ -149,7 +149,7 @@ class GitHubPortal:
         cls: type["GitHubPortal"],
         method: Literal["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
         url: str,
-        **kwargs,
+        **kwargs: JSONDict,
     ) -> Response:
         """
         Makes an asynchronous HTTP request to the Github API.
@@ -169,7 +169,7 @@ class GitHubPortal:
         if cls._client is None:
             raise RuntimeError("HTTP client is not initialized.")
 
-        response = await cls._client.request(method, url, **kwargs)
+        response = await cls._client.request(method, url, **kwargs)  # type: ignore[arg-type]
 
         return response
 
@@ -201,7 +201,7 @@ class GitHubPortal:
         except Exception as e:
             return (500, ErrorMessage(code=500, message=str(e), endpoint="/user"))
 
-        cls._authenticated = True  # type: ignore[attr-defined]
+        cls._authenticated = True
 
         return (res.status_code, PrivateUser(**res.json()))
 
@@ -209,7 +209,9 @@ class GitHubPortal:
 def needs_authentication(
     function: Callable[..., Any],
 ) -> classmethod[Any, ..., CoroutineType[Any, Any, Any]]:
-    async def wrapper(cls: type[GitHubPortal], *args, **kwargs) -> Any:
+    async def wrapper(
+        cls: type[GitHubPortal], *args: tuple[object, ...], **kwargs: JSONDict
+    ) -> Any:
         # Special case: allow authenticate() to run without being authenticated
         if function.__name__ == "authenticate":
             return await function(cls, *args, **kwargs)
@@ -220,7 +222,7 @@ def needs_authentication(
                 ErrorMessage(
                     code=401,
                     message="User is not authenticated. Please call authenticate() first.",
-                    endpoint=kwargs.get("endpoint", None),
+                    endpoint=cast(str | None, kwargs.get("endpoint", None)),
                 ),
             )
 

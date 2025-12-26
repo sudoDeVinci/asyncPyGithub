@@ -33,7 +33,7 @@ class GitHubUserPortal(GitHubPortal):
         """
         endpoint = USER_ENDPOINT
         try:
-            res = await cls.req("PATCH", endpoint, json=changes)
+            res = await cls.req("PATCH", endpoint, json=changes)  # type: ignore[arg-type]
             if res.status_code != 200:
                 return (
                     res.status_code,
@@ -168,7 +168,7 @@ class GitHubUserPortal(GitHubPortal):
             contexts: list[HoverCardContextJSON] = cardjson.get("contexts", [])
             contexts_checked: list[HoverCardContext] = [
                 HoverCardContext(**context) for context in contexts
-            ]  # type: ignore[call-arg]
+            ]
             return (res.status_code, HoverCard(contexts=contexts_checked))
 
         except Exception as e:

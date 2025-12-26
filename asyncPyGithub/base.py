@@ -3,9 +3,9 @@ from logging import Logger, getLogger
 from os import makedirs
 from pathlib import Path
 from threading import Lock
-from typing import Any, Final
+from typing import Final, cast
 
-from dotenv import load_dotenv  # type: ignore
+from dotenv import load_dotenv
 
 LOGGER: Logger = getLogger(__name__)
 LOGGER.setLevel("INFO")
@@ -22,7 +22,7 @@ REPO_CACHE_LOCK: Lock = Lock()
 USER_CACHE_LOCK: Lock = Lock()
 
 
-def write_json(fp: Path, data: dict[str, Any] | None) -> bool:
+def write_json(fp: Path, data: dict[str, object] | None) -> bool:
     """
     Writes a dictionary to a JSON file at the specified path.
     Args:
@@ -45,7 +45,7 @@ def write_json(fp: Path, data: dict[str, Any] | None) -> bool:
         return False
 
 
-def read_json(fp: Path) -> dict[str, Any] | None:
+def read_json(fp: Path) -> dict[str, object] | None:
     """
     Reads a JSON file from the specified path and returns its content as a dictionary.
     Args:
@@ -61,7 +61,7 @@ def read_json(fp: Path) -> dict[str, Any] | None:
         with open(fp, "r", encoding="utf-8") as f:
             data = load(f)
             LOGGER.info(f"read_json:::{fp} read successfully")
-            return data
+            return cast(dict[str, object], data)
     except (IOError, OSError, JSONDecodeError) as err:
         LOGGER.error(f"read_json:::Failed to read data from {fp} with error: {err}")
         return None
