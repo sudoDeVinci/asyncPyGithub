@@ -32,21 +32,21 @@ async def test_get_organization_repos_successful(
         return_value=Response(200, json=mock_repos)
     )
 
-    response: tuple[
-        int, list[MinimalRepository] | ErrorMessage
-    ] = await GitHubRepositoryPortal.get_organization_repos(
-        organization="LEGO",
-        type="all",
-        sort="full_name",
-        direction="asc",
-        per_page=5,
-        page=1,
+    response: tuple[int, list[MinimalRepository] | ErrorMessage] = (
+        await GitHubRepositoryPortal.get_organization_repos(
+            organization="LEGO",
+            type="all",
+            sort="full_name",
+            direction="asc",
+            per_page=5,
+            page=1,
+        )
     )
     status, repos = response
     assert status == 200, f">> Could not fetch organization repositories::{repos}"
     assert isinstance(repos, list), "Expected a list of MinimalRepository instances."
     for repo in repos:
-        assert isinstance(repo, MinimalRepository), (
-            "Expected a MinimalRepository instance."
-        )
+        assert isinstance(
+            repo, MinimalRepository
+        ), "Expected a MinimalRepository instance."
         repo = cast(MinimalRepository, repo)

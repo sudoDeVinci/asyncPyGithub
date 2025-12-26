@@ -34,9 +34,9 @@ async def test_authenticate_sucessful(mock_requests: respx.MockRouter) -> None:
     assert isinstance(user, PrivateUser), "Expected a PrivateUser instance."
     user = cast(PrivateUser, user)
     assert GitHubPortal._authenticated, f">> Could not authenticate User portal::{user}"
-    assert user.model_dump(mode="json") == mock_user, (
-        f"User data mismatch: {user.model_dump(mode='json')} != {mock_user}"
-    )
+    assert (
+        user.model_dump(mode="json") == mock_user
+    ), f"User data mismatch: {user.model_dump(mode='json')} != {mock_user}"
 
 
 @no_type_check
@@ -78,9 +78,9 @@ async def test_get_by_id_successful(mock_requests: respx.MockRouter) -> None:
     assert status == 200, "Could not get User by ID."
     assert isinstance(user, PrivateUser), "Expected a PrivateUser instance."
     user = cast(PrivateUser, user)
-    assert user.model_dump(mode="json") == mock_response, (
-        f"User data mismatch: {user.model_dump(mode='json')} != {mock_response}"
-    )
+    assert (
+        user.model_dump(mode="json") == mock_response
+    ), f"User data mismatch: {user.model_dump(mode='json')} != {mock_response}"
 
 
 @no_type_check
@@ -132,9 +132,9 @@ async def test_update_user_successful(mock_requests: respx.MockRouter) -> None:
     assert status == 200, "Could not update User."
     assert isinstance(user, PrivateUser), "Expected a PrivateUser instance."
     user = cast(PrivateUser, user)
-    assert user.model_dump(mode="json") == mock_response, (
-        f"User data mismatch: {user.model_dump(mode='json')} != {mock_response}"
-    )
+    assert (
+        user.model_dump(mode="json") == mock_response
+    ), f"User data mismatch: {user.model_dump(mode='json')} != {mock_response}"
 
 
 @no_type_check
@@ -177,17 +177,17 @@ async def test_get_by_username_successful(mock_requests: respx.MockRouter) -> No
         return_value=Response(200, json=mock_response)
     )
 
-    response: tuple[
-        int, PrivateUser | ErrorMessage
-    ] = await GitHubUserPortal.get_by_username("someusername")
+    response: tuple[int, PrivateUser | ErrorMessage] = (
+        await GitHubUserPortal.get_by_username("someusername")
+    )
     status, user = response
 
     assert status == 200, "Could not get user by username"
     assert isinstance(user, PrivateUser), "Expected a PrivateUser instance."
     user = cast(PrivateUser, user)
-    assert user.model_dump(mode="json") == mock_response, (
-        f"User data mismatch: {user.model_dump(mode='json')} != {mock_response}"
-    )
+    assert (
+        user.model_dump(mode="json") == mock_response
+    ), f"User data mismatch: {user.model_dump(mode='json')} != {mock_response}"
 
 
 @no_type_check
@@ -203,9 +203,9 @@ async def test_get_by_username_unsuccessful(mock_requests: respx.MockRouter) -> 
         return_value=Response(404, json=mock_error)
     )
 
-    response: tuple[
-        int, PrivateUser | ErrorMessage
-    ] = await GitHubUserPortal.get_by_username("nonexistentuser")
+    response: tuple[int, PrivateUser | ErrorMessage] = (
+        await GitHubUserPortal.get_by_username("nonexistentuser")
+    )
     status, user = response
     assert status == 404, "Expected 404 Not Found."
     assert isinstance(user, ErrorMessage), "Expected an ErrorMessage instance."
@@ -241,12 +241,12 @@ async def test_get_all_users_pg01_pp05(mock_requests: respx.MockRouter) -> None:
     assert status == 200, "Could not get all users."
     assert len(users) == 5, "Expected 5 users, got a different number."
     assert isinstance(users, list), "Expected a list of SimpleUser instances."
-    assert all(isinstance(user, SimpleUser) for user in users), (
-        "Expected all items to be SimpleUser instances."
-    )
+    assert all(
+        isinstance(user, SimpleUser) for user in users
+    ), "Expected all items to be SimpleUser instances."
 
     users = cast(list[SimpleUser], users)
     for mock_user, user in zip(mock_response, users):
-        assert user.model_dump(mode="json") == mock_user, (
-            f"User data mismatch: {user.model_dump(mode='json')} != {mock_user}"
-        )
+        assert (
+            user.model_dump(mode="json") == mock_user
+        ), f"User data mismatch: {user.model_dump(mode='json')} != {mock_user}"

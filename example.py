@@ -16,9 +16,9 @@ from asyncPyGithub import (
 from asyncPyGithub.base import LOGGER
 
 try:
-    assert load_dotenv(verbose=True), (
-        "Failed to load environment variables from .env file."
-    )
+    assert load_dotenv(
+        verbose=True
+    ), "Failed to load environment variables from .env file."
     TOKEN = environ.get("GITHUB_TOKEN", environ.get("TOKEN", None))
 
     assert TOKEN is not None, "GITHUB_TOKEN must be set in environment variables."
