@@ -1,18 +1,17 @@
-from pydantic import BaseModel, HttpUrl
+from datetime import datetime
 from typing import (
-    TypedDict,
-    NotRequired,
-    Literal,
-    List,
-    Optional,
     Any,
     Dict,
+    List,
+    Literal,
+    NotRequired,
+    Optional,
+    TypedDict,
 )
 
-from datetime import datetime
+from pydantic import BaseModel, HttpUrl
 
-from .users import SimpleUserJSON, SimpleUser
-
+from .users import SimpleUser, SimpleUserJSON
 
 RepositoryType = Literal[
     "all", "public", "private", "forks", "sources", "member", "owner"
@@ -477,7 +476,7 @@ class FullRepository(BaseModel):
     notifications_url: HttpUrl
     pulls_url: HttpUrl
     releases_url: HttpUrl
-    ssh_url: Optional[HttpUrl] = None
+    ssh_url: Optional[str] = None
     stargazers_url: Optional[HttpUrl] = None
     subscribers_url: Optional[HttpUrl] = None
     subscription_url: Optional[HttpUrl] = None

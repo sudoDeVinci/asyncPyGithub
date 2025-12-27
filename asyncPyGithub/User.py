@@ -2,12 +2,17 @@ from typing import Final, Literal
 
 from ._types import (
     ErrorMessage,
+    FullRepository,
+    FullRepositoryJSON,
     GitHubPortal,
     HoverCard,
     HoverCardContext,
     HoverCardContextJSON,
     HoverCardJSON,
     PrivateUser,
+    RepositoryType,
+    RepoSortCriterion,
+    RepoSortDirection,
     SimpleUser,
     SimpleUserJSON,
     needs_authentication,
@@ -22,6 +27,71 @@ USERS_ENDPOINT: Final[Literal["/users"]] = "/users"
 
 
 class GitHubUserPortal(GitHubPortal):
+    @needs_authentication
+    async def repositories(
+        cls: "GitHubUserPortal",
+        visibility: RepositoryType = "all",
+        sort: RepoSortCriterion = "full_name",
+        direction: RepoSortDirection = "asc",
+        per_page: int = 30,
+        page: int = 1,
+        since: str | None = None,
+        before: str | None = None,
+    ) -> tuple[int, list[FullRepository] | ErrorMessage]:
+        """
+        Get the authenticated user's repositories.
+        This function uses the `/user/repos` endpoint to get the user's repositories.
+        Available: [https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-repositories-for-the-authenticated-user](https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-repositories-for-the-authenticated-user)
+
+        Args:
+            visibility (RepositoryType, optional): The visibility of the repositories to retrieve. Defaults to "all".
+            sort (RepoSortCriterion, optional): The criterion to sort the repositories by. Defaults to "full_name".
+            direction (RepoSortDirection, optional): The direction to sort the repositories. Defaults to "asc".
+            per_page (int, optional): The number of repositories to retrieve per page. Defaults to 30.
+            page (int, optional): The page number to retrieve. Defaults to 1.
+            since (str | None, optional): A timestamp in ISO 8601 format to filter repositories updated after this time. Defaults to None.
+            before (str | None, optional): A timestamp in ISO 8601 format to filter repositories updated before this time. Defaults to None.
+
+        Returns:
+            tuple[int, list[FullRepository] | ErrorMessage]: A tuple containing the status code and either a list of FullRepository instances or an ErrorMessage.
+        """
+        endpoint = f"{USER_ENDPOINT}/repos"
+        params = {
+            "visibility": visibility,
+            "sort": sort,
+            "direction": direction,
+            "per_page": per_page,
+            "page": page,
+        }
+        if since:
+            params["since"] = since  # type: ignore[assignment]
+        if before:
+            params["before"] = before  # type: ignore[assignment]
+
+        try:
+            res = await cls.req("GET", endpoint, params=params)  # type: ignore[arg-type]
+            if res.status_code != 200:
+                return (
+                    res.status_code,
+                    ErrorMessage(
+                        code=res.status_code,
+                        message=res.json().get("message", "Unknown error"),
+                        endpoint=endpoint,
+                    ),
+                )
+
+            repos_json = res.json()
+            repos: list[FullRepository] = [
+                FullRepository(**repo_json) for repo_json in repos_json
+            ]
+            return (res.status_code, repos)
+
+        except Exception as e:
+            return (
+                500,
+                ErrorMessage(code=500, message=str(e), endpoint=endpoint),
+            )
+
     @needs_authentication
     async def update(
         cls: "GitHubUserPortal", changes: SimpleUserJSON

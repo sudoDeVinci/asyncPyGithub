@@ -3,6 +3,8 @@ from typing import Literal, Optional
 from typing_extensions import Self
 
 from ._types import (
+    ContentTree,
+    ContentTreeJSON,
     Contributor,
     ErrorMessage,
     FullRepository,
@@ -496,3 +498,75 @@ class GitHubRepositoryPortal(GitHubPortal):
             )
 
         return (res.status_code, Topics(**res.json()))
+
+    @needs_authentication
+    async def get_repo_content(
+        cls: Self,
+        owner: str,
+        repo: str,
+        path: str,
+        mediatype: Literal["raw", "html", "object", "default"] = "default",
+    ) -> tuple[int, ContentTree | bytes | ErrorMessage]:
+        """
+        Gets the contents of a file or directory in a repository. Specify the file path or directory with the path parameter. If you omit the path parameter, you will receive the contents of the repository's root directory.
+
+        This endpoint supports the following custom media types. For more information, see "Media types."
+
+        application/vnd.github.raw+json: Returns the raw file contents for files and symlinks.
+        application/vnd.github.html+json: Returns the file contents in HTML. Markup languages are rendered to HTML using GitHub's open-source Markup library.
+        application/vnd.github.object+json: Returns the contents in a consistent object format regardless of the content type. For example, instead of an array of objects for a directory, the response will be an object with an entries attribute containing the array of objects.
+        If the content is a directory, the response will be an array of objects, one object for each item in the directory. When listing the contents of a directory, submodules have their "type" specified as "file". Logically, the value should be "submodule". This behavior exists for backwards compatibility purposes. In the next major version of the API, the type will be returned as "submodule".
+
+        If the content is a symlink and the symlink's target is a normal file in the repository, then the API responds with the content of the file. Otherwise, the API responds with an object describing the symlink itself.
+
+        If the content is a submodule, the submodule_git_url field identifies the location of the submodule repository, and the sha identifies a specific commit within the submodule repository. Git uses the given URL when cloning the submodule repository, and checks out the submodule at that specific commit. If the submodule repository is not hosted on github.com, the Git URLs (git_url and _links["git"]) and the github.com URLs (html_url and _links["html"]) will have null values.
+
+        Args:
+            owner (str): The owner of the repository.
+            repo (str): The name of the repository.
+            path (str): The content path.
+            mediatype (Literal["raw", "html", "object", "default"]): The media type of the content to return.
+
+        Returns:
+            tuple[int, ContentTree | bytes | ErrorMessage]: A tuple containing the status code and the content tree, raw bytes, or an error message.
+        """
+        match mediatype:
+            case "raw":
+                mediareturntype = "application/vnd.github.raw+json"
+            case "html":
+                mediareturntype = "application/vnd.github.html+json"
+            case "object":
+                mediareturntype = "application/vnd.github.object+json"
+            case _:
+                mediareturntype = "application/vnd.github+json"
+
+        try:
+            res = await cls.req(
+                "GET",
+                f"repos/{owner}/{repo}/contents/{path}",
+                headers={"accept": mediareturntype},
+            )
+
+            if res.status_code != 200:
+                return (
+                    res.status_code,
+                    ErrorMessage(
+                        code=res.status_code,
+                        message=res.json().get("message", "Unknown error"),
+                        endpoint=f"repos/{owner}/{repo}/contents/{path}",
+                    ),
+                )
+            match mediatype:
+                case "raw" | "html":
+                    return (res.status_code, res.content)
+                case _:
+                    return (res.status_code, ContentTree(**res.json()))
+        except Exception as e:
+            return (
+                500,
+                ErrorMessage(
+                    code=500,
+                    message=str(e),
+                    endpoint=f"repos/{owner}/{repo}/contents/{path}",
+                ),
+            )

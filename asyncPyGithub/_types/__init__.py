@@ -1,37 +1,43 @@
 from .base import (
     ErrorMessage,
-    JSONDict,
     GitHubPortal,
+    JSONDict,
     needs_authentication,
 )
-
+from .content import (
+    ContentLink,
+    ContentLinkJSON,
+    ContentNode,
+    ContentNodeJSON,
+    ContentTree,
+    ContentTreeJSON,
+)
 from .repos import (
+    Commit,
+    FullRepository,
+    FullRepositoryJSON,
+    MinimalRepository,
+    MinimalRepositoryJSON,
     RepositoryType,
     RepoSortCriterion,
     RepoSortDirection,
     RepoVisibility,
-    MinimalRepositoryJSON,
-    MinimalRepository,
-    FullRepositoryJSON,
-    FullRepository,
-    Commit,
     Tag,
-    TopicsJSON,
     Topics,
+    TopicsJSON,
 )
-
 from .users import (
-    UserPlanJSON,
-    PrivateUserJSON,
-    PrivateUser,
-    SimpleUserJSON,
-    SimpleUser,
-    HoverCardJSON,
-    HoverCard,
-    HoverCardContextJSON,
-    HoverCardContext,
     Contributor,
     ContributorJSON,
+    HoverCard,
+    HoverCardContext,
+    HoverCardContextJSON,
+    HoverCardJSON,
+    PrivateUser,
+    PrivateUserJSON,
+    SimpleUser,
+    SimpleUserJSON,
+    UserPlanJSON,
 )
 
 __all__ = (
@@ -62,4 +68,10 @@ __all__ = (
     "Tag",
     "TopicsJSON",
     "Topics",
+    "ContentLink",
+    "ContentLinkJSON",
+    "ContentNode",
+    "ContentNodeJSON",
+    "ContentTree",
+    "ContentTreeJSON",
 )

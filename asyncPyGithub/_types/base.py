@@ -163,7 +163,6 @@ class GitHubPortal:
             RuntimeError: If an error occurs while making the request.
         """
         if cls._client is None:
-            print("HTTP client is not initialized. Starting client...")
             await cls.start()
 
         if cls._client is None:
