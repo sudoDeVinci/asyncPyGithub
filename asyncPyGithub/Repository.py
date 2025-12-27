@@ -3,8 +3,8 @@ from typing import Literal, Optional
 from typing_extensions import Self
 
 from ._types import (
+    ContentNode,
     ContentTree,
-    ContentTreeJSON,
     Contributor,
     ErrorMessage,
     FullRepository,
@@ -541,6 +541,7 @@ class GitHubRepositoryPortal(GitHubPortal):
                 mediareturntype = "application/vnd.github+json"
 
         try:
+            # print(f">> Fetching content from repos/{owner}/{repo}/contents/{path} with mediatype {mediatype}")
             res = await cls.req(
                 "GET",
                 f"repos/{owner}/{repo}/contents/{path}",
@@ -560,7 +561,12 @@ class GitHubRepositoryPortal(GitHubPortal):
                 case "raw" | "html":
                     return (res.status_code, res.content)
                 case _:
-                    return (res.status_code, ContentTree(**res.json()))
+                    data = res.json()
+                    # If the API returned a file, it will not have an 'entries' key.
+                    if "entries" in data:
+                        return (res.status_code, ContentTree(**data))
+
+                    return (res.status_code, ContentNode(**data))
         except Exception as e:
             return (
                 500,

@@ -1,10 +1,5 @@
-import string
-from datetime import datetime
 from typing import (
-    Any,
-    Dict,
     List,
-    Literal,
     NotRequired,
     Optional,
     TypedDict,
@@ -27,7 +22,7 @@ class ContentLink(BaseModel):
 
 class ContentNodeJSON(TypedDict):
     type: str
-    size: str
+    size: int
     name: str
     path: str
     sha: str
@@ -41,7 +36,7 @@ class ContentNodeJSON(TypedDict):
 
 class ContentNode(BaseModel):
     type: str
-    size: str
+    size: int
     name: str
     path: str
     sha: str
