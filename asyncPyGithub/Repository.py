@@ -506,7 +506,7 @@ class GitHubRepositoryPortal(GitHubPortal):
         repo: str,
         path: str,
         mediatype: Literal["raw", "html", "object", "default"] = "default",
-    ) -> tuple[int, ContentTree | bytes | ErrorMessage]:
+    ) -> tuple[int, ContentTree | ContentNode | bytes | ErrorMessage]:
         """
         Gets the contents of a file or directory in a repository. Specify the file path or directory with the path parameter. If you omit the path parameter, you will receive the contents of the repository's root directory.
 
@@ -528,7 +528,7 @@ class GitHubRepositoryPortal(GitHubPortal):
             mediatype (Literal["raw", "html", "object", "default"]): The media type of the content to return.
 
         Returns:
-            tuple[int, ContentTree | bytes | ErrorMessage]: A tuple containing the status code and the content tree, raw bytes, or an error message.
+            tuple[int, ContentTree | ContentNode | bytes | ErrorMessage]: A tuple containing the status code and the content tree, raw bytes, or an error message.
         """
         match mediatype:
             case "raw":
